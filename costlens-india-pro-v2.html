@@ -575,10 +575,10 @@ function lineChartFx(elId,lgId,cfg){
 
 /* ═══════════ TAB5 新闻雷达 ═══════════ */
 const NEWS_TOPICS=[
-  { key:'tariff', name:'关税与进口政策', q:'India import duty appliances customs' },
-  { key:'bis', name:'BIS / QCO 认证动态', q:'India BIS QCO quality control order electronics' },
-  { key:'market', name:'家电市场动态', q:'India air conditioner refrigerator market sales' },
-  { key:'inr', name:'卢比汇率', q:'Indian rupee USD exchange rate' },
+  { key:'tariff', name:'关税与进口政策', q:'India import duty appliances customs', q2:'India customs duty home appliances news' },
+  { key:'bis', name:'BIS / QCO 认证动态', q:'India BIS QCO quality control order electronics', q2:'BIS certification India appliances news' },
+  { key:'market', name:'家电市场动态', q:'India air conditioner refrigerator market sales', q2:'India home appliance market growth news' },
+  { key:'inr', name:'卢比汇率', q:'rupee dollar exchange rate India forex', q2:'Indian rupee depreciation news' },
 ];
 function gnRss(q){ return 'https://news.google.com/rss/search?q='+encodeURIComponent(q)+'&hl=en-IN&gl=IN&ceid=IN:en'; }
 function gnLink(q){ return 'https://news.google.com/search?q='+encodeURIComponent(q)+'&hl=en-IN&gl=IN&ceid=IN:en'; }
@@ -590,30 +590,79 @@ function renderNewsShell(){
       <div class="src">直达（始终可用）：<a href="${gnLink(t.q)}" target="_blank">Google News 实时检索</a> · <a href="https://economictimes.indiatimes.com/industry/cons-products/durables" target="_blank">经济时报·耐用消费品版</a> · <a href="https://www.business-standard.com/industry/news" target="_blank">Business Standard 产业版</a></div>
     </div>`).join('');
 }
+/* 兼容性超时（不依赖 AbortSignal.timeout，旧版微信浏览器也能跑） */
+function newsFetch(url, ms){
+  return new Promise(function(resolve, reject){
+    var ctrl = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+    var timer = setTimeout(function(){ if(ctrl) ctrl.abort(); reject(new Error('超时')); }, ms);
+    fetch(url, ctrl ? {signal: ctrl.signal} : {})
+      .then(function(r){ clearTimeout(timer); resolve(r); },
+            function(e){ clearTimeout(timer); reject(e); });
+  });
+}
+/* 三通道依次尝试：rss2json(返回JSON最稳) → allorigins → codetabs */
+async function fetchFeed(rssUrl, statusEl){
+  // 通道1：rss2json
+  try{
+    if(statusEl) statusEl.textContent = '通道 1/3 (rss2json)…';
+    const r = await newsFetch('https://api.rss2json.com/v1/api.json?rss_url='+encodeURIComponent(rssUrl), 10000);
+    if(r.ok){
+      const j = await r.json();
+      if(j.status==='ok' && j.items && j.items.length)
+        return j.items.slice(0,5).map(it=>({title:it.title, link:it.link, date:(it.pubDate||'').slice(0,16)}));
+    }
+  }catch(e){}
+  // 通道2/3：原文代理 + XML解析
+  const proxies = [
+    {n:'2/4 (allorigins)', f:u=>'https://api.allorigins.win/raw?url='+encodeURIComponent(u)},
+    {n:'3/4 (codetabs)',  f:u=>'https://api.codetabs.com/v1/proxy?quest='+encodeURIComponent(u)},
+    {n:'4/4 (corsproxy)', f:u=>'https://corsproxy.io/?url='+encodeURIComponent(u)},
+  ];
+  for(const p of proxies){
+    try{
+      if(statusEl) statusEl.textContent = '通道 '+p.n+'…';
+      const r = await newsFetch(p.f(rssUrl), 10000);
+      if(!r.ok) continue;
+      const xml = new DOMParser().parseFromString(await r.text(), 'text/xml');
+      const items = Array.prototype.slice.call(xml.querySelectorAll('item'), 0, 5);
+      if(items.length) return items.map(function(it){
+        var g=function(tag){ var n=it.querySelector(tag); return n?n.textContent:''; };
+        return {title:g('title'), link:g('link')||'#', date:(g('pubDate')||'').slice(0,16)};
+      });
+    }catch(e){}
+  }
+  return null;
+}
 async function loadAllNews(){
   const st=document.getElementById('news-status');
-  st.textContent='抓取中…（经公共代理，约 5–15 秒）';
-  let ok=0;
-  await Promise.all(NEWS_TOPICS.map(async t=>{
+  const btn=document.querySelector('#tab-news .btn');
+  if(btn) btn.disabled=true;
+  st.textContent='抓取中（逐个主题，每个最多 4 个通道）…';
+  let ok=0, idx=0;
+  for(const t of NEWS_TOPICS){   // 逐个抓取 + 间隔2秒，避免触发免费接口的限流
+    if(idx++ > 0) await new Promise(r=>setTimeout(r, 2000));
     const el=document.getElementById('news-'+t.key);
-    try{
-      const res=await fetch('https://api.allorigins.win/raw?url='+encodeURIComponent(gnRss(t.q)),{signal:AbortSignal.timeout(15000)});
-      if(!res.ok) throw new Error('proxy '+res.status);
-      const xml=new DOMParser().parseFromString(await res.text(),'text/xml');
-      const items=[...xml.querySelectorAll('item')].slice(0,5);
-      if(!items.length) throw new Error('empty');
-      el.innerHTML=items.map(it=>{
-        const title=it.querySelector('title')?.textContent||'';
-        const link=it.querySelector('link')?.textContent||'#';
-        const date=(it.querySelector('pubDate')?.textContent||'').slice(0,16);
-        return `<div class="news-item"><a href="${link}" target="_blank">${title}</a><div class="meta">${date}</div></div>`;
-      }).join('');
-      ok++;
-    }catch(e){
-      el.innerHTML=`<div style="font-size:12.5px;color:var(--amber);">⚠️ 自动抓取失败（${String(e.message||e).slice(0,40)}）。当前网络可能无法访问代理/Google——请用下方「直达链接」，内容相同。</div>`;
+    const stEl=document.createElement('div');
+    stEl.style.cssText='font-size:12px;color:var(--muted);';
+    el.innerHTML=''; el.appendChild(stEl);
+    let items = await fetchFeed(gnRss(t.q), stEl);
+    if(!items && t.q2){  // 主查询整链失败 → 换备用查询词再试一轮（新的缓存键）
+      await new Promise(r=>setTimeout(r, 1500));
+      stEl.textContent = '换备用查询词重试…';
+      items = await fetchFeed(gnRss(t.q2), stEl);
     }
-  }));
-  st.textContent= ok? `已更新 ${ok}/${NEWS_TOPICS.length} 个主题 · ${new Date().toLocaleTimeString('zh-CN')}` : '本网络环境下自动抓取不可用——请使用各主题下方的直达链接。';
+    if(items && items.length){
+      el.innerHTML=items.map(it=>
+        `<div class="news-item"><a href="${it.link}" target="_blank">${it.title.replace(/</g,'&lt;')}</a><div class="meta">${it.date}</div></div>`).join('');
+      ok++;
+    } else {
+      el.innerHTML='<div style="font-size:12.5px;color:var(--amber);line-height:1.7;">⚠️ 自动抓取通道都未成功（当前网络可能拦截了代理服务）。<b>内容没有丢</b>——点下方「直达链接」就是同样的实时新闻流。</div>';
+    }
+    st.textContent=`抓取中… 已完成 ${NEWS_TOPICS.indexOf(t)+1}/${NEWS_TOPICS.length}`;
+  }
+  if(btn) btn.disabled=false;
+  st.textContent = ok ? `✓ 已更新 ${ok}/${NEWS_TOPICS.length} 个主题 · ${new Date().toLocaleTimeString('zh-CN')}`
+                      : '自动抓取在当前网络不可用——请用各主题下方的直达链接（内容相同，始终可用）。';
 }
 
 /* ═══════════ TAB6 我的数据与参数 ═══════════ */
