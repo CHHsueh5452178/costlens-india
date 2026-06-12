@@ -117,6 +117,7 @@
   <button data-tab="fx" onclick="showTab('fx',this)">💱 汇率风险</button>
   <button data-tab="region" onclick="showTab('region',this)">🗺 区域市场</button>
   <button data-tab="sources" onclick="showTab('sources',this)">📚 数据源导航</button>
+  <button data-tab="cert" onclick="showTab('cert',this)">🧩 认证地图</button>
   <button data-tab="news" onclick="showTab('news',this)">📰 新闻雷达</button>
   <button data-tab="mydata" onclick="showTab('mydata',this)">📥 我的数据与参数</button>
 </nav>
@@ -283,6 +284,60 @@
         <tr><td><a href="https://pib.gov.in/" target="_blank"><b>PIB 政府新闻局</b></a></td><td>PLI 计划、关税调整等政策的第一手官方发布</td><td>政策变化的最早信号源</td></tr>
       </tbody>
     </table>
+  </div>
+</section>
+
+<!-- ════════════ TAB 4.5 认证地图 ════════════ -->
+<section id="tab-cert" class="tab">
+  <div class="note"><b>回答客户最常问的问题：「为什么空调到了印度就变成 CKD？」</b><br>
+  因为强制认证是<b>落在部件上的，不只是整机</b>：整机有整机的 ISI 标准，压缩机、温控、铜管、钢板各有各的 QCO——其中铜管和钢板的认证对象是<b>生产厂（轧机/铜厂）本身</b>，中国大多数厂没有印度 BIS 证 → 这些部件进不去 → 只能在印度本地向持证厂采购 → 整机被一层层"拆散"，剩下能进口的散件越来越少——<b>这就是 CKD + 本地化的真正成因，是认证网络设计出来的结果，不是企业偏好</b>。下表逐个部件给出标准号与出处，全部可点击核验。</div>
+
+  <div class="panel">
+    <h3>🌬 分体空调 · 部件级认证地图</h3>
+    <table>
+      <thead><tr><th>部件/对象</th><th>强制认证</th><th>标准 / 依据</th><th>对进口模式的影响</th></tr></thead>
+      <tbody>
+        <tr><td><b>整机（分体）</b></td><td><span class="tag ban">ISI 必须</span></td><td>IS 1391 (Part 2):2018 <a href="https://www.bis.gov.in/wp-content/uploads/2021/07/PM-1391-2-modified-Amndt-4.pdf" target="_blank">[BIS产品手册PDF]</a></td><td>即使 SKD/CKD 本地总装，出厂整机仍需 ISI 标志；叠加 DGFT 含制冷剂整机进口禁令 → CBU 路径死</td></tr>
+        <tr><td>整机（窗机/一体）</td><td><span class="tag ban">ISI 必须</span></td><td>IS 1391 (Part 1):2017 <a href="https://evtlindia.com/bis-qco-for-unitary-air-conditioners-is-1391-part-1-2017" target="_blank">[QCO说明]</a></td><td>同上</td></tr>
+        <tr><td><b>密闭压缩机</b></td><td><span class="tag ban">ISI 必须</span></td><td>IS 10617 · 空调及相关零部件QCO（2025修订）<a href="https://www.elitasrcs.com/quality-control-orders/bis-qco-notification-for-air-conditioner-and-its-related-parts-hermetic-compressors-and-temperature-sensing-controls" target="_blank">[QCO]</a></td><td>进口压缩机需<b>外国厂家持FMCS证</b>→ 已在印或已认证的供应商（GMCC/Highly印度产能）成为采购首选</td></tr>
+        <tr><td><b>制冷用铜管</b>（您客户问的）</td><td><span class="tag ban">ISI 必须</span></td><td>IS 10773:1995 · 铜产品QCO 2024（2024-04-25发布，2024-10起分阶段强制；2025-02-19修订）<a href="https://www.bis.gov.in/copper-product-quality-control-amendment-order-2025/?lang=en" target="_blank">[BIS原文]</a> <a href="https://www.pib.gov.in/PressReleasePage.aspx?PRID=1970008&reg=3&lang=2" target="_blank">[PIB公告]</a></td><td><b>认证对象是铜管厂</b>：中国铜管厂多未持BIS证 → 铜管从散件清单里"拆出去"，改在印度本地向持证厂买 → 散件进一步变散</td></tr>
+        <tr><td><b>钢板/板材</b>（您客户问的）</td><td><span class="tag ban">钢厂必须持证</span></td><td>钢铁QCO 2024（S.O. 3716(E)，2024-08-29，覆盖HS 72/73章151个标准；<b>2025-06-16起原料投入也须合规</b>）<a href="https://steel.gov.in/quality-control-orders" target="_blank">[钢铁部QCO清单]</a> <a href="https://www.certification-india.com/en/india-tightens-bis-requirements-for-imported-steel-and-input-materials-under-qco-compliance-framework/" target="_blank">[2025收紧解读]</a></td><td>进口含钢板散件需<b>轧钢厂BIS证+材质证明书(MTC)</b> → 面板/箱体钢件转为本地冲压（用持证印度钢）</td></tr>
+        <tr><td>翅片换热器（两器）</td><td><span class="tag cond">列入零部件标准</span></td><td>IS 11329 <a href="https://evtlindia.com/bis-qco-for-split-air-conditioners-is-1391-part-2-2018" target="_blank">[整机QCO关联件清单]</a></td><td>自产换热器需用持证铜管+持证铝箔来源 → 倒逼两器本地化</td></tr>
+        <tr><td>风扇电机</td><td><span class="tag cond">能效/安全标准</span></td><td>IS 12615（电机能效）</td><td>可进口，建议选已有印度供货记录的型号</td></tr>
+        <tr><td>温控器件</td><td><span class="tag ban">ISI 必须</span></td><td>IS 60730-2-9 · 同零部件QCO 2025</td><td>同压缩机逻辑</td></tr>
+        <tr><td>电容/电线</td><td><span class="tag cond">视品类</span></td><td>电容 IS 2993/IS 13340；电线 IS 694（QCO已覆盖）</td><td>小件，本地采购通常更省事</td></tr>
+        <tr><td>制冷剂</td><td><span class="tag info">非BIS体系</span></td><td>HFC配额（基加利修正案履约）+ 臭氧规则；整机含氟禁令的源头</td><td>本地充注是SKD/CKD的必备工序</td></tr>
+      </tbody>
+    </table>
+    <div class="rec"><b>一句话给客户：</b>空调在印度 = 整机ISI + 压缩机ISI + 铜管厂证 + 钢厂证 + 温控ISI 的认证矩阵。矩阵里每多一格"外国厂没证"，散件清单就拆掉一件、本地化一件——拆到最后剩下的就是 CKD。您客户说"铜管要BIS认证拆很散所以变成了CKD"，<b>完全正确</b>，上面就是逐条出处。</div>
+  </div>
+
+  <div class="panel">
+    <h3>🧊 冰箱 · 🌀 洗衣机 · 💨 空气净化器</h3>
+    <table>
+      <thead><tr><th>品类</th><th>整机认证</th><th>关键部件认证</th><th>模式含义</th></tr></thead>
+      <tbody>
+        <tr><td><b>冰箱</b></td><td>IS 7872（制冷器具QCO）+ 家电安全QCO 2024（IS 302系列，2025-03起分阶段）<a href="https://alephindia.in/bis-qco-extension-for-refrigerating-appliances.php" target="_blank">[QCO]</a></td><td>压缩机 IS 10617；制冷铜管 IS 10773；箱体钢板→钢铁QCO；发泡料无强制</td><td>与空调同构：压缩机+铜管+钢板三张"厂证网"推动直冷线本地化；风冷高端线 CBU 过渡期需提前办整机证</td></tr>
+        <tr><td><b>洗衣机</b></td><td>IS 302-2-7:2010（家用洗衣电器QCO 2023）<a href="https://www.bis.gov.in/wp-content/uploads/2024/03/Electrical-appliance-for-domestic-clothes-washing-QCO-2023.pdf" target="_blank">[QCO原文PDF]</a></td><td>电机/线缆/钢板（钢铁QCO）；无压缩机与铜管问题</td><td>认证矩阵比冰空简单 → 这就是"波轮直接找本地代工最快"的认证侧原因（代工厂已持证）</td></tr>
+        <tr><td><b>空气净化器</b></td><td>IS 302 (Part 1):2024（家电安全QCO 2024，2024-09-20通告）<a href="https://evtlindia.com/isi-mark/bis-certification-for-air-cleaning-appliances" target="_blank">[认证说明]</a> ⚠️ 注意：走 <b>ISI 许可</b>路线（此前资料常误写为CRS注册）</td><td>滤网无强制；电源线 IS 694</td><td>只有一张整机证 + 低关税7.5% → 认证一次性办好后 CBU 直发完全成立</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="panel">
+    <h3>🛠 认证怎么办：流程、工具与材料清单（FMCS 外国制造商路线）</h3>
+    <table>
+      <thead><tr><th>步骤</th><th>内容</th><th>工具/入口</th></tr></thead>
+      <tbody>
+        <tr><td><b>① 指定 AIR</b></td><td>必须先指定一名授权印度代表（Authorized Indian Representative），承担合规连带责任</td><td>代理机构或自有印度实体</td></tr>
+        <tr><td><b>② 在线申请</b></td><td>FMCS 路线（外国工厂拿 ISI 证）在 BIS 官方门户提交：工厂注册文件、平面图、组织架构、QC手册、检测设备清单、原材料合规证明（注意：钢/铜原料本身也要可追溯到持证厂）</td><td><a href="https://www.manakonline.in/" target="_blank">Manak Online（BIS官方门户）</a></td></tr>
+        <tr><td><b>③ 工厂审核</b></td><td>BIS 官员<b>赴中国工厂现场审核</b>（差旅费由申请方承担），核对产线、检测能力与QC记录</td><td>按 BIS (Conformity Assessment) Regulations 2018 Scheme-I</td></tr>
+        <tr><td><b>④ 样品测试</b></td><td>样品送<b>BIS认可实验室（在印度境内）</b>按对应IS标准全项测试（如分体机按 IS 1391 Pt.2 的产品手册要求）</td><td><a href="https://www.bis.gov.in/index.php/laboratory-2/bis-laboratories/" target="_blank">BIS 认可实验室名录</a> · <a href="https://www.bis.gov.in/wp-content/uploads/2021/07/PM-1391-2-modified-Amndt-4.pdf" target="_blank">产品手册示例(IS 1391-2)</a></td></tr>
+        <tr><td><b>⑤ 发证与标志</b></td><td>获 ISI 标志许可（含R-编号），按产量缴标志费（royalty）；每型号族单独覆盖</td><td>证书状态公开可查：<a href="https://www.manakonline.in/" target="_blank">Manak 持证查询</a>（也能查竞争对手）</td></tr>
+        <tr><td><b>⑥ 持续合规</b></td><td>年度监督审核 + 市场抽样；QCO清单每年扩围，需盯紧新通告</td><td><a href="https://www.bis.gov.in/upcoming-qcos-notified-and-due-for-implementation/?lang=en" target="_blank">BIS 待实施QCO官方清单</a></td></tr>
+      </tbody>
+    </table>
+    <div class="note" style="margin-bottom:0;"><b>时间与费用量级（计划用）：</b>整机 FMCS 全流程典型 <b>4–8 个月</b>；费用构成 = 申请/审核费 + 审核官差旅 + 实验室测试费 + 年度标志费，每型号族合计通常数十万人民币量级（本平台认证费参数即此口径，按3年摊销，可改）。<b>捷径：</b>委托已持证的印度 ODM（Amber/Dixon/PGEL/EPACK）= 跳过②–④，用对方的证出货——这也是认证侧支持"轻资产代工优先"的原因。</div>
   </div>
 </section>
 
@@ -572,10 +627,10 @@ function renderReco(p, sc, modes, best){
   // ⑤ 品类特定合规
   if(p.cat==='ac') li.push(`<b>⑤ 本品类合规要点：</b>压缩机与温控器件已纳入 QCO（2025年修订）——CKD 进口压缩机也要 BIS 认证，倒逼用已认证供应商（GMCC/Highly 在印产能）或本地采购；整机需 BEE 星级（ISEER）能效标签。 <a href="https://www.elitasrcs.com/quality-control-orders/bis-qco-notification-for-air-conditioner-and-its-related-parts-hermetic-compressors-and-temperature-sensing-controls" target="_blank">[压缩机QCO]</a> <a href="https://www.beestarlabel.com/" target="_blank">[BEE数据库]</a>`);
   if(p.cat==='fridgeFF'||p.cat==='fridgeDC'||p.cat==='washerFL'||p.cat==='washerTL') li.push(`<b>⑤ 本品类合规要点：</b>家用电器安全 QCO 2024（IS 302系列）已于2025年3月起分阶段强制——无论哪种模式，整机都需 BIS 认证（4–8个月）+ 能效标签（适用品类）。 <a href="https://absoluteveritas.com/bis-qco-for-safety-of-household-commercial-and-similar-electrical-appliances/" target="_blank">[QCO 2024时间表]</a>`);
-  if(p.cat==='purifier') li.push(`<b>⑤ 本品类合规要点：</b>空净走 BIS CRS 注册（比 FMCS 快）+ 授权印度代表（AIR），无禁令、低关税（HS 84213920 BCD 7.5%）——这是唯一"中国整机直发"经济性成立的品类，小米即此打法。 <a href="https://www.eximguru.com/indian-customs-duty/84213920-other-air-purifiers-or-cleaners.aspx" target="_blank">[税率出处]</a>`);
+  if(p.cat==='purifier') li.push(`<b>⑤ 本品类合规要点：</b>空净需 IS 302 (Part 1):2024 的 <b>ISI 许可</b>（家电安全QCO 2024 纳入空气净化器）+ 授权印度代表（AIR）——只有一张整机证、无部件认证矩阵、无禁令、低关税（HS 84213920 BCD 7.5%），所以是唯一"中国整机直发"经济性成立的品类（小米即此打法）。详见【🧩 认证地图】。 <a href="https://evtlindia.com/isi-mark/bis-certification-for-air-cleaning-appliances" target="_blank">[认证出处]</a> <a href="https://www.eximguru.com/indian-customs-duty/84213920-other-air-purifiers-or-cleaners.aspx" target="_blank">[税率出处]</a>`);
   // ⑥ 执行路径
   if(best.key!=='cbu') li.push(`<b>⑥ 执行路径（PN3 下怎么落地）：</b>Press Note 3 使中资自建/控股工厂需印度政府审批且长期停滞——${MODE_NAMES[best.key]}的现实做法是<b>委托已持证的印度 ODM</b>：安珀 Amber Enterprises (NSE: AMBER)、迪克森 Dixon Technologies (DIXON)、PG Electroplast (PGEL)、EPACK——均为上市公司，签约前财报免费尽调。 <a href="https://www.screener.in/" target="_blank">[Screener 财报]</a> <a href="https://www.manakonline.in/" target="_blank">[查持证]</a>`);
-  else li.push(`<b>⑥ 执行路径：</b>CBU 模式下您是进口商=法定"生产者"：需提前完成 BIS（CRS/FMCS）、能效标签（适用时）与 E-waste EPR 注册，认证 4–8 个月先行启动，再按销售季倒排海运。`);
+  else li.push(`<b>⑥ 执行路径：</b>CBU 模式下您是进口商=法定"生产者"：需提前完成 BIS 认证（本品类适用 ISI 许可，流程见【🧩 认证地图】）、能效标签（适用时）与 E-waste EPR 注册，认证 4–8 个月先行启动，再按销售季倒排海运。`);
   document.getElementById('reco-text').innerHTML =
     '<ul style="margin-left:18px; line-height:1.9; font-size:13px;">' +
     li.map(x=>`<li style="margin-bottom:9px;">${x}</li>`).join('') + '</ul>';
@@ -934,9 +989,9 @@ const CL_KB = [
   src:'细节请咨询印度税务顾问；模拟器默认按可抵扣计算', tab:'calc', rel:['tariff']},
  {id:'bis', kw:['bis','认证','qco','测试','实验室','授权代表','认证多久','认证费','拿证'],
   q:'BIS 认证要多久？',
-  a:'典型周期 <b>4–8 个月</b>：印度境内实验室测试 + 工厂审核（FMCS 路线）或 CRS 注册 + 指定授权印度代表（AIR）。注意 2024–2026 年 QCO 强制认证范围在持续扩大：家电安全 QCO 2024 已于 2025 年 3 月起分阶段强制，空调零部件（压缩机/温控）QCO 2025 年修订生效。<b>认证是比关税更卡时间的壁垒，务必比销售季提前 6 个月以上启动。</b>',
-  src:'出处：<a href="https://www.bis.gov.in/upcoming-qcos-notified-and-due-for-implementation/?lang=en" target="_blank">BIS QCO 官方清单</a> · 查任何企业持证：<a href="https://www.manakonline.in/" target="_blank">Manak Online</a>',
-  rel:['bee','accbu','epr']},
+  a:'典型周期 <b>4–8 个月</b>：印度境内实验室测试 + 工厂审核（外国工厂走 FMCS 路线拿 ISI 许可）+ 指定授权印度代表（AIR）。注意 2024–2026 年 QCO 强制认证范围在持续扩大：家电安全 QCO 2024 已于 2025 年 3 月起分阶段强制，空调零部件（压缩机/温控）QCO 2025 年修订生效。<b>认证是比关税更卡时间的壁垒，务必比销售季提前 6 个月以上启动。</b>',
+  src:'出处：<a href="https://www.bis.gov.in/upcoming-qcos-notified-and-due-for-implementation/?lang=en" target="_blank">BIS QCO 官方清单</a> · 查任何企业持证：<a href="https://www.manakonline.in/" target="_blank">Manak Online</a> · 完整流程与材料清单见【🧩 认证地图】',
+  tab:'cert', rel:['certmap','bee','accbu','epr']},
  {id:'bee', kw:['能效','标签','星级','bee','iseer'],
   q:'能效标签是强制的吗？',
   a:'空调（ISEER 标准）和风冷冰箱等品类<b>强制</b>星级能效标签，且标准逐年加严——中国国标机型不能直接平移，需按印度标准重新设计与测试。在 <a href="https://www.beestarlabel.com/" target="_blank">beestarlabel.com</a> 可免费查所有在售注册机型的能效布局。',
@@ -953,6 +1008,11 @@ const CL_KB = [
   q:'CKD/SKD/CBU 怎么选？',
   a:'选择由<b>三层逻辑</b>决定，不是一刀切：<b>①政策层</b>——空调含制冷剂整机被 DGFT 禁止（没有CBU选项）；其他品类三种都合法。<b>②税率层</b>——整机 BCD 20% vs 零部件约5–15%，印度刻意做了税率梯度+PLI补贴引导本地组装。<b>③规模层（最容易被忽略）</b>——CKD 要养组装线和团队（年固定成本），<b>量小时 CBU/SKD 反而更便宜</b>，量大才轮到 CKD。所以正确问法不是"哪种模式好"，而是"<b>在我的年销量下哪种模式好</b>"——【🧮 模拟器】的盈亏平衡图会给出您的临界量。',
   src:'依据：DGFT 禁令 + CBIC 税率梯度 + 模拟器盈亏平衡计算（参数可改）', tab:'calc', rel:['breakeven','tariff','accbu']},
+ {id:'certmap', kw:['哪些部件','部件认证','零部件认证','铜管','铜管要','为什么铜管','钢板','板材','认证地图','拆散','为什么拆','拆很散','拆得很散','部件要','散件认证','换热器','压缩机认证','变成了ckd','变成ckd'],
+  q:'哪些部件要单独认证？为什么空调被拆成 CKD？',
+  a:'因为印度的强制认证<b>落在部件上</b>，且部分认证对象是<b>生产厂本身</b>：空调整机 IS 1391、压缩机 IS 10617、温控 IS 60730-2-9（零部件QCO 2025）、<b>制冷铜管 IS 10773</b>（铜产品QCO 2024，认证对象=铜管厂）、<b>钢板</b>（钢铁QCO 2024，认证对象=轧钢厂，2025年6月起原料也要合规）。中国的铜管厂/钢厂大多没有 BIS 证 → 这些件进不了印度 → 改为本地向持证厂采购 → 散件清单越拆越散，<b>CKD 是认证网络设计出来的结果</b>。每个部件的标准号和出处见【🧩 认证地图】页。',
+  src:'出处：<a href="https://www.bis.gov.in/copper-product-quality-control-amendment-order-2025/?lang=en" target="_blank">铜产品QCO（BIS原文）</a> · <a href="https://steel.gov.in/quality-control-orders" target="_blank">钢铁部QCO清单</a> · <a href="https://www.elitasrcs.com/quality-control-orders/bis-qco-notification-for-air-conditioner-and-its-related-parts-hermetic-compressors-and-temperature-sensing-controls" target="_blank">空调零部件QCO</a>',
+  tab:'cert', rel:['bis','modes','accbu']},
  {id:'breakeven', kw:['盈亏平衡','临界','多少量','规模','breakeven','break even','门槛','量多大','值不值'],
   q:'年销量多大才值得做 CKD？',
   a:'公式：<b>临界量 = (CKD年固定成本 − 现模式年固定成本) ÷ (现模式每台变动成本 − CKD每台变动成本)</b>。直觉：CKD 每台省的钱（主要是关税差+运费差）要先"还清"组装线的年固定投入。以默认参数的 1.5匹空调为例：CKD 比 SKD 每台省约 ₹1,000+，但多 ₹1,800万/年固定成本 → 临界量约 1.7万台/年——低于它选 SKD，高于它选 CKD。<b>每个品类、每组参数的临界量都不同</b>，模拟器的「盈亏平衡」图实时画给您看（竖虚线=您当前的量）。',
@@ -980,7 +1040,7 @@ const CL_KB = [
   src:'出处：Bloomberg（海尔交易）等，报告版附链接', rel:['pn3','modes']},
  {id:'purifier', kw:['净化器','空净','purifier'],
   q:'空气净化器怎么进？',
-  a:'<b>唯一适合中国整机直发（CBU）的品类</b>：BCD 仅 7.5% + IGST 18%（综合约 26.9%），无禁令。需 BIS CRS 注册 + 授权印度代表（AIR）。市场集中在德里 NCR 雾霾季（10–1 月），<b>按雾霾季倒排海运备货</b>。小米、飞利浦都是这个打法。',
+  a:'<b>唯一适合中国整机直发（CBU）的品类</b>：BCD 仅 7.5% + IGST 18%（综合约 26.9%），无禁令。认证走 <b>IS 302 (Part 1):2024 的 ISI 许可</b>（家电安全 QCO 2024 已纳入空气净化器，2024-09-20 通告）+ 授权印度代表（AIR）。市场集中在德里 NCR 雾霾季（10–1 月），<b>按雾霾季倒排海运备货</b>。小米、飞利浦都是这个打法。',
   src:'税率出处：<a href="https://www.eximguru.com/indian-customs-duty/84213920-other-air-purifiers-or-cleaners.aspx" target="_blank">HS 84213920（EximGuru）</a>', tab:'calc', rel:['bis','region']},
  {id:'fridge', kw:['冰箱','直冷','风冷','无霜','对开门'],
   q:'冰箱应该怎么进？',
