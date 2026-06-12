@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CostLens 印度智研平台 · 落地成本模拟 / 汇率 / 区域市场 / 数据源 / 新闻雷达</title>
+<style>
+  :root{
+    --blue:#2563eb; --blue-dark:#1e40af; --bg:#f4f6fa; --card:#fff;
+    --text:#1f2937; --muted:#6b7280; --red:#dc2626; --green:#16a34a;
+    --amber:#b45309; --border:#e5e7eb; --saffron:#f59e0b; --purple:#7c3aed;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{font-family:"Microsoft YaHei","PingFang SC",-apple-system,"Segoe UI",sans-serif;
+    background:var(--bg); color:var(--text); font-size:14px;}
+  header{background:linear-gradient(135deg,#7c2d12,#b45309); color:#fff; padding:16px 28px;
+    display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;}
+  header h1{font-size:19px; font-weight:700;}
+  header .sub{font-size:12px; opacity:.92; margin-top:4px;}
+  header a{color:#fde68a; text-decoration:none;}
+  nav{display:flex; gap:2px; background:#fff; padding:0 22px; border-bottom:1px solid var(--border); flex-wrap:wrap; position:sticky; top:0; z-index:10;}
+  nav button{border:none; background:none; padding:12px 13px; font-size:13.5px; cursor:pointer;
+    color:var(--muted); border-bottom:2.5px solid transparent; font-weight:600;}
+  nav button.active{color:var(--amber); border-bottom-color:var(--saffron);}
+  main{max-width:1140px; margin:0 auto; padding:20px 20px 60px;}
+  .tab{display:none;}
+  .tab.active{display:block;}
+  h2{font-size:16px; margin:18px 0 8px; font-weight:700;}
+  h2:first-child{margin-top:0;}
+  h3{font-size:14px; margin:12px 0 6px; font-weight:700;}
+  .sub{color:var(--muted); font-size:12.5px; margin-bottom:12px; line-height:1.8;}
+  .cards{display:grid; grid-template-columns:repeat(auto-fit,minmax(215px,1fr)); gap:12px; margin-bottom:16px;}
+  .card{background:var(--card); border:1px solid var(--border); border-radius:12px; padding:14px 16px;}
+  .card .k{font-size:12px; color:var(--muted); margin-bottom:6px;}
+  .card .v{font-size:19px; font-weight:700;}
+  .card .d{font-size:12px; margin-top:5px; color:var(--muted); line-height:1.6;}
+  .panel{background:var(--card); border:1px solid var(--border); border-radius:12px; padding:16px 18px; margin-bottom:16px;}
+  table{width:100%; border-collapse:collapse; font-size:13px;}
+  th{text-align:left; color:var(--muted); font-weight:600; padding:8px; border-bottom:1.5px solid var(--border); white-space:nowrap; background:#fafbfc;}
+  td{padding:9px 8px; border-bottom:1px solid #f1f3f7; vertical-align:middle; line-height:1.6;}
+  td input[type=number]{width:90px; padding:5px 6px; border:1px solid var(--border); border-radius:6px; font-size:13px;}
+  td input[type=text]{padding:5px 6px; border:1px solid var(--border); border-radius:6px; font-size:13px; width:150px;}
+  td select{padding:5px 6px; border:1px solid var(--border); border-radius:6px; font-size:13px;}
+  .tag{display:inline-block; padding:2px 9px; border-radius:99px; font-size:11.5px; font-weight:600; white-space:nowrap; margin:1px 2px;}
+  .tag.ban{background:#fee2e2; color:var(--red);}
+  .tag.ok{background:#dcfce7; color:var(--green);}
+  .tag.cond{background:#fef3c7; color:#92400e;}
+  .tag.info{background:#dbeafe; color:var(--blue-dark);}
+  .tag.est{background:#f3e8ff; color:#6b21a8;}
+  .badge{display:inline-block; padding:1px 8px; border-radius:99px; font-size:11px; font-weight:600; margin-left:6px; vertical-align:middle;}
+  .badge.real{background:#dcfce7; color:#166534;}
+  .badge.est{background:#fef3c7; color:#92400e;}
+  .badge.user{background:#ede9fe; color:#5b21b6;}
+  .btn{background:var(--saffron); color:#fff; border:none; padding:8px 16px; border-radius:8px; font-size:13px; cursor:pointer; font-weight:600;}
+  .btn.blue{background:var(--blue);}
+  .btn.ghost{background:#fff; color:var(--amber); border:1px solid var(--saffron);}
+  .btn-row{display:flex; gap:10px; margin-top:12px; flex-wrap:wrap;}
+  .note{background:#fffbeb; border:1px solid #fde68a; border-radius:10px; padding:12px 14px;
+    font-size:12.5px; color:#78350f; line-height:1.8; margin:12px 0;}
+  .note.blue{background:#eff6ff; border-color:#bfdbfe; color:#1e3a8a;}
+  .src{font-size:11.5px; color:var(--muted); margin-top:10px; line-height:1.8; border-top:1px dashed var(--border); padding-top:8px;}
+  .src a, td a{color:var(--blue); text-decoration:none;}
+  .guide{background:linear-gradient(135deg,#fffbeb,#fff7ed); border:1px solid #fcd34d; border-radius:12px;
+    padding:14px 18px; margin-bottom:18px; font-size:13px; line-height:1.9;}
+  .guide b{color:#92400e;}
+  .guide .steps{display:grid; grid-template-columns:repeat(auto-fit,minmax(215px,1fr)); gap:10px; margin-top:8px;}
+  .guide .step{background:#ffffffd0; border-radius:10px; padding:10px 12px; font-size:12.5px;}
+  .guide .step b{display:block; margin-bottom:4px;}
+  .slider-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:14px;}
+  .slider-item{padding:10px 12px; background:#fafaf5; border-radius:10px; border:1px solid #f1f3f7;}
+  .slider-item .lab{display:flex; justify-content:space-between; font-size:13px; margin-bottom:6px;}
+  .slider-item .lab b{color:var(--amber);}
+  input[type=range]{width:100%; accent-color:var(--saffron);}
+  .delta-pos{color:var(--red); font-weight:600;}
+  .delta-neg{color:var(--green); font-weight:600;}
+  .legend{display:flex; gap:16px; flex-wrap:wrap; font-size:12px; color:var(--muted); margin-bottom:6px;}
+  .legend i{display:inline-block; width:18px; height:3px; border-radius:2px; margin-right:5px; vertical-align:middle;}
+  .chart-wrap{overflow-x:auto;}
+  .del{color:var(--muted); cursor:pointer; border:none; background:none; font-size:15px;}
+  .del:hover{color:var(--red);}
+  textarea{width:100%; min-height:80px; border:1px solid var(--border); border-radius:8px; padding:8px; font-size:12.5px; font-family:Consolas,monospace;}
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+  @media(max-width:840px){.grid2{grid-template-columns:1fr;}}
+  .region{border-left:4px solid var(--saffron); padding-left:12px; margin-bottom:14px;}
+  .news-item{padding:9px 0; border-bottom:1px solid #f1f3f7; font-size:13px; line-height:1.6;}
+  .news-item a{color:var(--blue-dark); text-decoration:none; font-weight:600;}
+  .news-item .meta{font-size:11.5px; color:var(--muted); margin-top:2px;}
+  .winner{outline:2px solid var(--green); outline-offset:-2px; background:#f0fdf4;}
+  footer{max-width:1140px; margin:0 auto; padding:0 20px 30px; color:var(--muted); font-size:12px; line-height:1.8;}
+  /* 手机适配（微信内打开） */
+  @media(max-width:520px){
+    header{padding:10px 12px;} header h1{font-size:15.5px;} header .sub{font-size:11px;}
+    nav{overflow-x:auto; flex-wrap:nowrap; padding:0 6px; -webkit-overflow-scrolling:touch;}
+    nav button{padding:11px 9px; font-size:12px; white-space:nowrap;}
+    main{padding:12px 10px 50px;}
+    .guide{padding:11px 12px; font-size:12.5px;}
+    .guide .steps{grid-template-columns:1fr;}
+    .panel{padding:12px 12px;}
+    .card .v{font-size:16.5px;}
+    table{font-size:12px;}
+    td input[type=number]{width:70px;}
+    .slider-grid{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>🇮🇳 CostLens 印度智研平台 <span class="badge real" style="font-size:11px;">交互版 PRO · 2026-06-12</span></h1>
+    <div class="sub">落地成本模拟 · 汇率风险 · 区域市场 · 可点击核验的数据源 · 印度本地新闻雷达 ｜ <a href="costlens-india.html">📄 政策报告版</a></div>
+  </div>
+</header>
+
+<nav>
+  <button class="active" data-tab="calc" onclick="showTab('calc',this)">🧮 落地成本模拟器</button>
+  <button data-tab="fx" onclick="showTab('fx',this)">💱 汇率风险</button>
+  <button data-tab="region" onclick="showTab('region',this)">🗺 区域市场</button>
+  <button data-tab="sources" onclick="showTab('sources',this)">📚 数据源导航</button>
+  <button data-tab="news" onclick="showTab('news',this)">📰 新闻雷达</button>
+  <button data-tab="mydata" onclick="showTab('mydata',this)">📥 我的数据与参数</button>
+</nav>
+
+<main>
+
+<div class="guide">
+  <b>📖 30 秒看懂这个平台怎么用</b>（所有蓝色数字都可以点击修改；<span class="badge real">实测数据</span>=有出处可点击核验，<span class="badge est">估计值</span>=行业典型值、您可在【📥我的数据与参数】里改成自己的实际数字，<span class="badge user">用户数据</span>=您输入的）
+  <div class="steps">
+    <div class="step"><b>① 选产品、看三种模式</b>在【🧮模拟器】选一个产品，系统并排算出 CBU整机 / SKD半散件 / CKD全散件 三种进口模式的印度落地成本，绿框=最优。</div>
+    <div class="step"><b>② 拖滑块做情景</b>卢比再贬 5%？关税加 5 个点？海运涨 30%？拖动滑块，三种模式的成本实时重算——这就是给客户演示「为什么要这样进印度」的画面。</div>
+    <div class="step"><b>③ 换成你自己的数字</b>FOB 价、年销量、组装费、认证费全部可改；【📥我的数据】可批量粘贴产品表、保存方案、导出 Excel。</div>
+    <div class="step"><b>④ 核验与跟踪</b>每个税率旁有官方来源链接（印度的政策和贸易数据全部公开免费——见【📚数据源导航】）；【📰新闻雷达】自动拉取印度本地最新报道。</div>
+  </div>
+</div>
+
+<!-- ════════════ TAB 1 落地成本模拟器 ════════════ -->
+<section id="tab-calc" class="tab active">
+  <div class="panel">
+    <h2>第 1 步 · 选择产品（或在【📥我的数据】添加/导入）</h2>
+    <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+      <select id="c-prod" onchange="renderCalc()" style="padding:8px 10px; border:1px solid var(--border); border-radius:8px; font-size:13.5px; min-width:240px;"></select>
+      <label style="font-size:13px;">FOB 单价 <input type="number" id="c-fob" style="width:100px; padding:6px;" onchange="updProdField('fob',this.value)"></label>
+      <select id="c-cur" onchange="updProdField('cur',this.value)" style="padding:6px; border:1px solid var(--border); border-radius:6px;">
+        <option value="USD">美元</option><option value="CNY">人民币</option>
+      </select>
+      <label style="font-size:13px;">年销量(台) <input type="number" id="c-vol" style="width:110px; padding:6px;" onchange="updProdField('vol',this.value)"></label>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>第 2 步 · 情景设置（拖动后下方实时重算）</h2>
+    <div class="slider-grid">
+      <div class="slider-item"><div class="lab"><span>卢比再贬值（当前 USD/INR <span id="fx-now">95.26</span>）</span><b id="v-inr">0%</b></div>
+        <input type="range" id="s-inr" min="-10" max="20" value="0" oninput="renderCalc()"></div>
+      <div class="slider-item"><div class="lab"><span>基本关税 BCD 变动（百分点）</span><b id="v-duty">+0pt</b></div>
+        <input type="range" id="s-duty" min="-10" max="15" value="0" oninput="renderCalc()"></div>
+      <div class="slider-item"><div class="lab"><span>海运费变动</span><b id="v-fr">0%</b></div>
+        <input type="range" id="s-fr" min="-30" max="80" value="0" oninput="renderCalc()"></div>
+      <div class="slider-item"><div class="lab"><span>FOB 采购价变动（联动中国成本端）</span><b id="v-fob">0%</b></div>
+        <input type="range" id="s-fob" min="-15" max="25" value="0" oninput="renderCalc()"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn ghost" onclick="resetScen()">重置情景</button>
+      <label style="font-size:12.5px; display:flex; align-items:center; gap:5px;">
+        <input type="checkbox" id="c-igst" checked onchange="renderCalc()"> IGST 按可抵扣处理（已注册印度 GST 时，进口 IGST 可抵销项税，不构成净成本）
+      </label>
+    </div>
+  </div>
+
+  <div class="cards" id="calc-cards"></div>
+
+  <div class="panel">
+    <h2>三种模式 · 单台落地成本对比 <span id="calc-prod-name" class="badge user"></span></h2>
+    <div class="chart-wrap" id="ch-modes"></div>
+    <div style="overflow-x:auto; margin-top:10px;">
+      <table id="calc-table"><thead></thead><tbody></tbody></table>
+    </div>
+    <div class="btn-row"><button class="btn ghost" onclick="exportCalc()">⬇ 导出对比结果 (CSV)</button></div>
+    <div class="src" id="calc-src"></div>
+  </div>
+
+  <div class="panel">
+    <h2>终端定价参考</h2>
+    <div class="sub">以最优模式的净落地成本为基础，加上渠道与品牌毛利（可拖动），看建议零售价落在印度市场什么位置。</div>
+    <div class="slider-item" style="max-width:420px;">
+      <div class="lab"><span>渠道+品牌综合加成</span><b id="v-mk">35%</b></div>
+      <input type="range" id="s-mk" min="15" max="60" value="35" oninput="renderCalc()">
+    </div>
+    <div class="cards" id="price-cards" style="margin-top:12px;"></div>
+  </div>
+</section>
+
+<!-- ════════════ TAB 2 汇率风险 ════════════ -->
+<section id="tab-fx" class="tab">
+  <div class="cards">
+    <div class="card"><div class="k">USD/INR（2026-06-11）</div><div class="v">95.26</div><div class="d">近12个月卢比贬值 <b class="delta-pos">−11.3%</b> <span class="badge real">实测数据</span></div></div>
+    <div class="card"><div class="k">2026 年内高点</div><div class="v">96.57</div><div class="d">2026-05-19 · 年均 92.85 <span class="badge real">实测数据</span></div></div>
+    <div class="card"><div class="k">CNY/INR（按 USD/CNY=<span id="fx-cny-d">7.10</span> 折算）</div><div class="v" id="fx-cnyinr">13.42</div><div class="d">USD/CNY 可在【📥我的数据】修改 <span class="badge est">估计值</span></div></div>
+    <div class="card"><div class="k">这对您客户意味着</div><div class="v" style="font-size:14px;">报价必须含汇率条款</div><div class="d">卢比两年贬约13%：固定INR价=利润被汇率吃掉</div></div>
+  </div>
+  <div class="panel">
+    <h2>USD/INR 走势（2024-07 至今）<span class="badge real">锚点为实测</span></h2>
+    <div class="sub">圆点为有出处的真实锚点，虚线为锚点间插值。趋势一目了然：<b>卢比在持续、单向地贬值</b>——这不是波动，是趋势。对以美元/人民币结算的中国出口商是利好（同样美元收入，印度客户的卢比成本上升），但对在印度持有卢比应收款、卢比定价合同的一方是持续损耗。</div>
+    <div class="legend" id="lg-fx"></div>
+    <div class="chart-wrap" id="ch-fx"></div>
+    <div class="src">📊 锚点来源：<a href="https://www.exchangerates.org.uk/USD-INR-spot-exchange-rates-history-2026.html" target="_blank">exchangerates.org.uk USD/INR 2026 历史页</a>（2026-06-11 收 95.26、5-19 高点 96.57、2026 均值 92.85、12个月变动 −11.31%，由此推得 2025-06 ≈ 85.6）；2024-07 ≈ 83.7、2025-02 ≈ 87.0 为公开市场常识锚点。官方权威序列请点 <a href="https://www.rbi.org.in/Scripts/ReferenceRateArchive.aspx" target="_blank">印度央行 RBI 参考汇率档案</a>（免费、可下载、按日）。</div>
+  </div>
+  <div class="panel">
+    <h2>汇率问题的 4 个实务对策（写进合同里）</h2>
+    <table>
+      <thead><tr><th>对策</th><th>怎么做</th><th>适用</th></tr></thead>
+      <tbody>
+        <tr><td><b>① 美元/人民币计价</b></td><td>对印度买家报 USD（或 CNY）价，汇率风险归买方——印度进口商已习惯 USD 计价</td><td>贸易型出口（CBU/散件销售）</td></tr>
+        <tr><td><b>② 汇率调整条款</b></td><td>合同写明：USD/INR 偏离基准 ±3% 即按公式调价（本模拟器的滑块就是演示工具）</td><td>长期供货协议</td></tr>
+        <tr><td><b>③ 远期锁汇</b></td><td>有卢比应收时买 USD/INR 远期；注意 INR 远期贴水约 2–4%/年（即锁汇本身有成本）</td><td>在印度有实体、收卢比的</td></tr>
+        <tr><td><b>④ 自然对冲</b></td><td>本地组装（CKD）使部分成本（人工、厂房、部分部件）变成卢比成本，与卢比收入自然匹配</td><td>上量后的本地化阶段——<b>汇率是 CKD 模式的隐藏优势</b></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ════════════ TAB 3 区域市场 ════════════ -->
+<section id="tab-region" class="tab">
+  <div class="cards">
+    <div class="card"><div class="k">印度空调市场（2025）</div><div class="v">≈1,540 万台</div><div class="d">2030 年预计约 2,800 万台 <span class="badge real">实测数据</span></div></div>
+    <div class="card"><div class="k">家庭空调渗透率</div><div class="v">≈10%</div><div class="d">中国约 80% —— 这就是增长空间 <span class="badge real">实测数据</span></div></div>
+    <div class="card"><div class="k">市场增速</div><div class="v">CAGR ≈ 14.8%</div><div class="d">2025–2033 预测（多家机构区间 12–16%）</div></div>
+    <div class="card"><div class="k">市场规模（价值）</div><div class="v">≈ $60 亿</div><div class="d">2025 年空调（各机构口径 $39–62 亿）</div></div>
+  </div>
+  <div class="panel">
+    <h2>四大区域 · 品类机会与落地要点 <span class="badge est">行业综合判断</span></h2>
+    <div class="region">
+      <h3>🌇 北部（德里NCR · 北方邦 · 旁遮普 · 拉贾斯坦）</h3>
+      <p style="font-size:13px;">夏季 45°C+ 极端高温，空调销售最旺（4–7月）；<b>全印唯一的空气净化器刚需市场</b>（德里雾霾季 10–1 月，AQI 常超 400）。制造集群：大诺伊达（Noida/Greater Noida）——迪克森 Dixon Technologies、海尔 Haier 第二园区所在。消费特征：价格带宽，从入门定频到高端变频都有量。</p>
+    </div>
+    <div class="region">
+      <h3>🏭 西部（马哈拉施特拉 · 古吉拉特）</h3>
+      <p style="font-size:13px;">经济中心孟买 + 制造走廊浦那（海尔一期园区、美的 Supa 工厂均在此）。<b>进口主门户</b>：那瓦舍瓦港（Nhava Sheva/JNPT）与蒙德拉港（Mundra）——中国发印度西线海运的默认目的港，规划物流时以此为基准。购买力全印最高，滚筒洗衣机、风冷冰箱等升级品类的第一市场。</p>
+    </div>
+    <div class="region">
+      <h3>🏖 南部（泰米尔纳德 · 卡纳塔克 · 安得拉/特伦甘纳）</h3>
+      <p style="font-size:13px;">全年炎热 → <b>空调全年有销量、季节性最弱</b>。金奈 Chennai 是"印度家电底特律"：安珀 Amber Enterprises、大金 Daikin、三星 Samsung 及大量零部件厂集聚；安得拉邦 Sri City 工业园是家电外资集中落户点。港口：金奈/卡图帕利。做 CKD 组装选址，南部供应链配套最好。</p>
+    </div>
+    <div class="region">
+      <h3>🌾 东部（西孟加拉 · 比哈尔 · 奥里萨）</h3>
+      <p style="font-size:13px;">收入水平较低、家电渗透率全印最低 → <b>未来 5–10 年的增量市场</b>。当前以风扇→空冷器(air cooler)→入门空调的升级路径为主；单门直冷冰箱、半自动波轮洗衣机是绝对主力。价格敏感度极高，适合性价比定位与渠道下沉打法。加尔各答港覆盖东线。</p>
+    </div>
+    <div class="src">区域分析为基于公开行业信息的综合判断（标注为行业综合判断）；市场规模数据来源：<a href="https://www.renub.com/india-air-conditioner-market-p.php" target="_blank">Renub Research India AC Market</a> · <a href="https://www.expertmarketresearch.com/reports/india-air-conditioner-market" target="_blank">Expert Market Research</a> · <a href="https://www.statista.com/outlook/cmo/household-appliances/major-appliances/air-conditioners/india/" target="_blank">Statista India Air Conditioners</a>。渗透率对比：印度约10% vs 中国约80%（多来源一致）。</div>
+  </div>
+</section>
+
+<!-- ════════════ TAB 4 数据源导航 ════════════ -->
+<section id="tab-sources" class="tab">
+  <div class="note"><b>给中国客户的一句话：</b>印度的监管、关税与贸易数据的公开程度<b>远超多数中国企业的想象</b>——关税税率、进口禁令原文、竞争对手的 BIS 持证情况、按海关编码逐月的进口量值，全部免费、官方、可在线查询。下面每一条都可以点进去自己核验。这也是本平台所有税率数字的出处。</div>
+  <div class="panel">
+    <table>
+      <thead><tr><th>数据源（点击直达）</th><th>能查到什么</th><th>对您客户的用法</th></tr></thead>
+      <tbody>
+        <tr><td><a href="https://www.cbic.gov.in/entities/customs-tariff" target="_blank"><b>CBIC 印度海关关税表</b></a></td><td>任意 HS 编码的现行 BCD/IGST/附加税率，官方原文</td><td>核验本模拟器的税率；报关前的最终确认</td></tr>
+        <tr><td><a href="https://www.dgft.gov.in/CP/?opt=notification" target="_blank"><b>DGFT 外贸总局通告库</b></a></td><td>进口政策与禁令原文（如 2020 空调制冷剂禁令）</td><td>确认品类是否受限/需许可证</td></tr>
+        <tr><td><a href="https://www.bis.gov.in/upcoming-qcos-notified-and-due-for-implementation/?lang=en" target="_blank"><b>BIS · QCO 实施清单</b></a> / <a href="https://www.manakonline.in/" target="_blank">许可证查询 Manak</a></td><td>强制认证品类与生效日期；<b>可查询任何企业的 BIS 持证情况</b></td><td>查竞争对手有没有证、哪些型号有证——免费的竞争情报</td></tr>
+        <tr><td><a href="https://tradestat.commerce.gov.in/" target="_blank"><b>商工部 Tradestat 贸易数据库</b></a></td><td>按 HS 编码 × 来源国 × 月度的进口量与金额</td><td><b>直接看到竞品从中国进了多少货、均价多少</b>——免费版海关数据</td></tr>
+        <tr><td><a href="https://www.rbi.org.in/Scripts/ReferenceRateArchive.aspx" target="_blank"><b>RBI 印度央行参考汇率</b></a></td><td>USD/INR 等官方日度参考汇率，可下载历史</td><td>合同汇率条款的基准源</td></tr>
+        <tr><td><a href="https://www.beestarlabel.com/" target="_blank"><b>BEE 能效标签数据库</b></a></td><td>所有已注册能效标签的型号、星级、厂商</td><td>查市场上在售机型的能效布局，定产品规格</td></tr>
+        <tr><td><a href="https://www.mca.gov.in/" target="_blank"><b>MCA 公司事务部</b></a></td><td>印度注册公司（含非上市）的年报与财务（少量费用）。如海尔印度 Haier Appliances India（非上市）的财报在此可查</td><td>尽调潜在经销商/合作伙伴的真实财务状况</td></tr>
+        <tr><td><a href="https://www.screener.in/" target="_blank"><b>Screener.in</b></a> / <a href="https://www.nseindia.com/" target="_blank">NSE 印度国家证交所</a></td><td><b>上市公司财报免费看</b>：印度主要家电代工/合作伙伴都是上市公司——Amber Enterprises（安珀，NSE: AMBER）、Dixon Technologies（迪克森，NSE: DIXON）、PG Electroplast（NSE: PGEL）、EPACK Durable（NSE: EPACK）、Voltas（沃尔塔斯，NSE: VOLTAS）、Havells（哈维尔斯，NSE: HAVELLS）——年报、季报、毛利率、客户集中度全部公开</td><td>选代工厂前先看它的财务健康度、产能扩张计划和现有客户——免费尽调</td></tr>
+        <tr><td><a href="https://www.ibef.org/industry/consumer-durables-presentation" target="_blank"><b>IBEF 消费耐用品行业报告</b></a></td><td>政府背景智库的免费行业数据与趋势报告</td><td>给客户做行业背景页的引用来源</td></tr>
+        <tr><td><a href="https://pib.gov.in/" target="_blank"><b>PIB 政府新闻局</b></a></td><td>PLI 计划、关税调整等政策的第一手官方发布</td><td>政策变化的最早信号源</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ════════════ TAB 5 新闻雷达 ════════════ -->
+<section id="tab-news" class="tab">
+  <div class="panel">
+    <h2>📰 印度本地新闻雷达</h2>
+    <div class="sub"><b>怎么用：</b>点「刷新新闻」自动抓取 Google News 印度版的最新报道（按下方四个主题）。⚠️ 透明说明：抓取经公共代理完成，在中国大陆网络环境下可能失败——失败时每个主题下方仍有<b>直达链接</b>，点开即是该主题的实时新闻流（Google News / 经济时报），效果相同。</div>
+    <div class="btn-row">
+      <button class="btn" onclick="loadAllNews()">🔄 刷新新闻（自动抓取）</button>
+      <span id="news-status" style="font-size:12.5px; color:var(--muted); align-self:center;"></span>
+    </div>
+    <div class="grid2" style="margin-top:14px;" id="news-grid"></div>
+  </div>
+</section>
+
+<!-- ════════════ TAB 6 我的数据与参数 ════════════ -->
+<section id="tab-mydata" class="tab">
+  <div class="panel">
+    <h2>产品清单 <span class="badge user">用户数据</span></h2>
+    <div class="sub">在这里维护产品；模拟器的下拉框与此同步。也可从 Excel 粘贴批量导入（格式：名称,品类代码,FOB价,币种,年销量；品类代码：ac=空调 fridgeFF=风冷冰箱 fridgeDC=直冷冰箱 washerFL=滚筒 washerTL=波轮 purifier=空净）。</div>
+    <div style="overflow-x:auto;">
+    <table id="md-prods"><thead><tr><th>名称</th><th>品类</th><th>FOB单价</th><th>币种</th><th>年销量</th><th></th></tr></thead><tbody></tbody></table>
+    </div>
+    <textarea id="md-paste" placeholder="1.5匹变频空调,ac,180,USD,50000&#10;300L风冷冰箱,fridgeFF,220,USD,30000"></textarea>
+    <div class="btn-row">
+      <button class="btn blue" onclick="importProds()">导入粘贴内容</button>
+      <button class="btn ghost" onclick="addProd()">＋ 手动加一行</button>
+    </div>
+  </div>
+  <div class="panel">
+    <h2>税率与成本参数（全部可改，改完模拟器立即生效）</h2>
+    <div class="sub">关税税率 <span class="badge real">实测数据</span> 有官方出处（见模拟器脚注与【📚数据源导航】）；海运费/组装费/认证费为 <span class="badge est">估计值</span>，强烈建议替换为您的实际询价。所有修改可「保存方案」到本机浏览器（不上传任何服务器）。</div>
+    <div style="overflow-x:auto;" id="md-params"></div>
+    <h3 style="margin-top:14px;">汇率参数</h3>
+    <div style="display:flex; gap:16px; flex-wrap:wrap; font-size:13px;">
+      <label>USD/INR <input type="number" id="p-usdinr" step="0.01" style="width:100px; padding:6px; border:1px solid var(--border); border-radius:6px;" onchange="updFx()"> <span class="badge real">2026-06-11</span></label>
+      <label>USD/CNY <input type="number" id="p-usdcny" step="0.01" style="width:100px; padding:6px; border:1px solid var(--border); border-radius:6px;" onchange="updFx()"> <span class="badge est">请按当日中间价修改</span></label>
+    </div>
+    <div class="btn-row">
+      <button class="btn" onclick="saveScheme()">💾 保存方案（本机）</button>
+      <button class="btn ghost" onclick="loadScheme()">📂 读取已存方案</button>
+      <button class="btn ghost" onclick="resetAll()">↺ 恢复默认参数</button>
+      <span id="save-status" style="font-size:12.5px; color:var(--green); align-self:center;"></span>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <b>透明度声明：</b>关税/IGST 税率、汇率锚点、市场规模为有出处的公开数据（各面板脚注可点击核验，检索日期 2026-06-12）；海运费、本地组装费、认证费、渠道加成为行业典型值<b>估计</b>，已全部开放修改。空调 CBU 模式因 DGFT 2020 制冷剂禁令标记为禁止。本工具为商业分析参考，正式决策请以印度官方现行通告与专业合规意见为准。 © 2026 CostLens 印度智研平台
+</footer>
+
+<script>
+/* ═══════════ 默认参数（可被用户修改/保存） ═══════════ */
+const DEFAULTS = {
+  fx: { usdinr: 95.26, usdcny: 7.10 },
+  cats: {
+    ac:       { name:'分体空调',     hs:'8415', retailRef:[28000,38000],
+      modes:{ cbu:{bcd:20, igst:28, freight:18, asm:0,   cert:2500000, banned:true},
+              skd:{bcd:15, igst:18, freight:15, asm:300, cert:2500000},
+              ckd:{bcd:10, igst:18, freight:12, asm:600, cert:2500000} } },
+    fridgeFF: { name:'冰箱·风冷无霜', hs:'8418', retailRef:[35000,55000],
+      modes:{ cbu:{bcd:20, igst:28, freight:22, asm:0,   cert:1800000},
+              skd:{bcd:15, igst:18, freight:16, asm:350, cert:1800000},
+              ckd:{bcd:10, igst:18, freight:13, asm:650, cert:1800000} } },
+    fridgeDC: { name:'冰箱·单门直冷', hs:'8418', retailRef:[12000,20000],
+      modes:{ cbu:{bcd:20, igst:28, freight:14, asm:0,   cert:1800000},
+              skd:{bcd:15, igst:18, freight:10, asm:250, cert:1800000},
+              ckd:{bcd:10, igst:18, freight:8,  asm:450, cert:1800000} } },
+    washerFL: { name:'洗衣机·滚筒',   hs:'8450', retailRef:[25000,40000],
+      modes:{ cbu:{bcd:20, igst:28, freight:12, asm:0,   cert:1500000},
+              skd:{bcd:15, igst:18, freight:10, asm:250, cert:1500000},
+              ckd:{bcd:10, igst:18, freight:8,  asm:450, cert:1500000} } },
+    washerTL: { name:'洗衣机·波轮',   hs:'8450', retailRef:[9000,18000],
+      modes:{ cbu:{bcd:20, igst:28, freight:8,  asm:0,   cert:1500000},
+              skd:{bcd:15, igst:18, freight:6,  asm:180, cert:1500000},
+              ckd:{bcd:10, igst:18, freight:5,  asm:350, cert:1500000} } },
+    purifier: { name:'空气净化器',    hs:'842139', retailRef:[8000,25000],
+      modes:{ cbu:{bcd:7.5, igst:18, freight:4,  asm:0,   cert:800000},
+              skd:{bcd:7.5, igst:18, freight:3.5,asm:120, cert:800000},
+              ckd:{bcd:5,   igst:18, freight:3,  asm:250, cert:800000} } },
+  },
+  prods: [
+    { name:'1.5匹变频空调',      cat:'ac',       fob:180, cur:'USD', vol:50000 },
+    { name:'300L风冷无霜冰箱',   cat:'fridgeFF', fob:220, cur:'USD', vol:30000 },
+    { name:'200L单门直冷冰箱',   cat:'fridgeDC', fob:120, cur:'USD', vol:40000 },
+    { name:'8kg滚筒洗衣机',      cat:'washerFL', fob:150, cur:'USD', vol:25000 },
+    { name:'8kg波轮洗衣机',      cat:'washerTL', fob:85,  cur:'USD', vol:35000 },
+    { name:'家用空气净化器',     cat:'purifier', fob:60,  cur:'USD', vol:20000 },
+  ],
+};
+let S = JSON.parse(JSON.stringify(DEFAULTS)); // 工作状态
+const MODE_NAMES = { cbu:'CBU 整机进口', skd:'SKD 半散件', ckd:'CKD 全散件' };
+
+const fmtINR = n=>'₹'+Math.round(n).toLocaleString('en-IN');
+const fmtN = n=>Math.round(n).toLocaleString('zh-CN');
+const pct=(n,d=1)=>(n>=0?'+':'')+(n*100).toFixed(d)+'%';
+
+/* ═══════════ 核心计算 ═══════════ */
+function scen(){
+  return {
+    inr:  parseFloat(document.getElementById('s-inr').value)/100,
+    duty: parseFloat(document.getElementById('s-duty').value),
+    fr:   parseFloat(document.getElementById('s-fr').value)/100,
+    fob:  parseFloat(document.getElementById('s-fob').value)/100,
+    igstCredit: document.getElementById('c-igst').checked,
+    mk:   parseFloat(document.getElementById('s-mk').value)/100,
+  };
+}
+function computeMode(prod, modeKey, sc){
+  const cat = S.cats[prod.cat], m = cat.modes[modeKey];
+  const usdinr = S.fx.usdinr * (1+sc.inr);
+  const fobUSD = (prod.cur==='CNY' ? prod.fob/S.fx.usdcny : prod.fob) * (1+sc.fob);
+  const frUSD = m.freight * (1+sc.fr);
+  const cifINR = (fobUSD + frUSD) * usdinr;
+  const bcdRate = Math.max(0, m.bcd + sc.duty)/100;
+  const bcd = cifINR * bcdRate;
+  const sws = bcd * 0.10;
+  const igst = (cifINR + bcd + sws) * m.igst/100;
+  const certU = m.cert / Math.max(1, prod.vol);
+  const asm = m.asm || 0;
+  const cash = cifINR + bcd + sws + igst + asm + certU;
+  const net = cash - (sc.igstCredit ? igst : 0);
+  return { banned: !!m.banned, fobUSD, frUSD, cifINR, bcd, sws, igst, asm, certU, cash, net, usdinr,
+           netUSD: net/usdinr, netCNY: net/usdinr*S.fx.usdcny };
+}
+function currentProd(){ return S.prods[parseInt(document.getElementById('c-prod').value)||0] || S.prods[0]; }
+
+/* ═══════════ TAB1 渲染 ═══════════ */
+function renderProdSelect(){
+  const sel = document.getElementById('c-prod');
+  const cur = sel.value;
+  sel.innerHTML = S.prods.map((p,i)=>`<option value="${i}">${p.name}（${S.cats[p.cat].name}）</option>`).join('');
+  if(cur && cur < S.prods.length) sel.value = cur;
+}
+function updProdField(f,v){
+  const p = currentProd();
+  if(f==='cur') p.cur = v;
+  else p[f] = Math.max(1, parseFloat(v)||1);
+  renderCalc(); renderProdsTable();
+}
+function resetScen(){ ['s-inr','s-duty','s-fr','s-fob'].forEach(id=>document.getElementById(id).value=0); renderCalc(); }
+
+function renderCalc(){
+  const p = currentProd(); if(!p) return;
+  const sc = scen();
+  document.getElementById('c-fob').value = p.fob;
+  document.getElementById('c-cur').value = p.cur;
+  document.getElementById('c-vol').value = p.vol;
+  document.getElementById('v-inr').textContent = pct(sc.inr,0);
+  document.getElementById('v-duty').textContent = (sc.duty>=0?'+':'')+sc.duty+'pt';
+  document.getElementById('v-fr').textContent = pct(sc.fr,0);
+  document.getElementById('v-fob').textContent = pct(sc.fob,0);
+  document.getElementById('v-mk').textContent = Math.round(sc.mk*100)+'%';
+  document.getElementById('fx-now').textContent = (S.fx.usdinr*(1+sc.inr)).toFixed(2);
+  document.getElementById('calc-prod-name').textContent = p.name;
+
+  const modes = ['cbu','skd','ckd'].map(k=>({key:k, r:computeMode(p,k,sc)}));
+  const valid = modes.filter(m=>!m.r.banned);
+  const best = valid.reduce((a,b)=>a.r.net<=b.r.net?a:b);
+
+  // KPI 卡
+  const worst = valid.reduce((a,b)=>a.r.net>b.r.net?a:b);
+  const savedYr = (worst.r.net-best.r.net)*p.vol;
+  document.getElementById('calc-cards').innerHTML =
+    card('最优模式', MODE_NAMES[best.key], `净落地 ${fmtINR(best.r.net)}/台（≈ ¥${fmtN(best.r.netCNY)}）`)+
+    card('vs 最差可行模式', fmtINR(worst.r.net-best.r.net)+'/台', `按年销量 ${fmtN(p.vol)} 台 = 年省 <b style="color:var(--green)">${fmtINR(savedYr)}</b>`)+
+    card('当前情景汇率', 'USD/INR '+(S.fx.usdinr*(1+sc.inr)).toFixed(2), sc.inr!==0?`卢比再贬 ${pct(sc.inr,0)} 的情景`:'实际市场价（2026-06-11）')+
+    card('提示', S.cats[p.cat].modes.cbu.banned?'⚠️ 该品类 CBU 被禁':'三种模式均可行', S.cats[p.cat].modes.cbu.banned?'DGFT 2020 制冷剂禁令（含制冷剂整机）':'按净成本选择即可');
+
+  // 对比表
+  const rows = [
+    ['FOB 货值（美元/台）', m=>'$'+m.fobUSD.toFixed(1)],
+    ['海运费（美元/台）<span class="badge est">估计值</span>', m=>'$'+m.frUSD.toFixed(1)],
+    ['CIF 卢比值', m=>fmtINR(m.cifINR)],
+    ['基本关税 BCD', m=>fmtINR(m.bcd)],
+    ['福利附加 SWS（BCD×10%）', m=>fmtINR(m.sws)],
+    ['IGST', m=>fmtINR(m.igst)+(sc.igstCredit?'（可抵扣）':'')],
+    ['本地组装费 <span class="badge est">估计值</span>', m=>m.asm?fmtINR(m.asm):'—'],
+    ['BIS认证摊销（费用÷年量）<span class="badge est">估计值</span>', m=>fmtINR(m.certU)],
+    ['<b>现金落地成本</b>', m=>'<b>'+fmtINR(m.cash)+'</b>'],
+    ['<b>净落地成本（抵扣后）</b>', m=>'<b>'+fmtINR(m.net)+'</b>'],
+    ['折合人民币/台', m=>'¥'+fmtN(m.netCNY)],
+  ];
+  let thead = '<tr><th>成本构成</th>';
+  modes.forEach(m=>{
+    const isBest = !m.r.banned && m.key===best.key;
+    thead += `<th class="${isBest?'winner':''}">${MODE_NAMES[m.key]}${m.r.banned?' <span class="tag ban">禁止</span>':isBest?' <span class="tag ok">最优</span>':''}</th>`;
+  });
+  thead += '</tr>';
+  document.querySelector('#calc-table thead').innerHTML = thead;
+  let tbody='';
+  rows.forEach(([label,fn])=>{
+    tbody += `<tr><td>${label}</td>`;
+    modes.forEach(m=>{
+      tbody += `<td class="${!m.r.banned&&m.key===best.key?'winner':''}">${m.r.banned?'<span style="color:var(--muted)">—</span>':fn(m.r)}</td>`;
+    });
+    tbody += '</tr>';
+  });
+  document.querySelector('#calc-table tbody').innerHTML = tbody;
+
+  // 柱状图
+  barChart('ch-modes', modes.map(m=>({
+    label: MODE_NAMES[m.key], banned: m.r.banned,
+    value: m.r.banned?0:m.r.net, best: !m.r.banned&&m.key===best.key })));
+
+  document.getElementById('calc-src').innerHTML =
+    `📊 税率出处（点击核验）：整机 BCD 20%（2018年起，<a href="https://www.indiatvnews.com/news/india-govt-hikes-import-duties-on-19-items-air-conditioners-fridge-washing-machine-to-get-costlier-from-tomorrow-465647" target="_blank">India TV 报道</a>）· 压缩机等零部件 10%（同上）· 空净 BCD 7.5%+IGST 18%（<a href="https://www.eximguru.com/indian-customs-duty/84213920-other-air-purifiers-or-cleaners.aspx" target="_blank">EximGuru HS 84213920</a>）· 现行税率最终确认：<a href="https://www.cbic.gov.in/entities/customs-tariff" target="_blank">CBIC 官方关税表</a> · 空调 CBU 禁令：<a href="https://www.coolingpost.com/world-news/india-bans-split-air-conditioner-imports/" target="_blank">DGFT 2020 通告</a>。SKD/CKD 行的税率为零部件税率的<b>简化加权代表值</b>（实际按零件逐项归类），上量前请做正式归类预裁定。`;
+
+  // 定价
+  const mrp = best.r.net*(1+sc.mk)*1.18; // 含 GST 18%（白电 28% 时下调？展示用 IGST 同档）
+  const gstRate = S.cats[p.cat].modes.cbu.igst/100;
+  const mrp2 = best.r.net*(1+sc.mk)*(1+gstRate);
+  const ref = S.cats[p.cat].retailRef;
+  document.getElementById('price-cards').innerHTML =
+    card('净落地成本（最优模式）', fmtINR(best.r.net), MODE_NAMES[best.key])+
+    card('含税建议零售价', fmtINR(mrp2), `加成 ${Math.round(sc.mk*100)}% + GST ${S.cats[p.cat].modes.cbu.igst}%`)+
+    card('市场零售参考带 <span class="badge est">估计值</span>', `${fmtINR(ref[0])} – ${fmtINR(ref[1])}`, mrp2<ref[0]?'低于市场带：有定价/利润空间':mrp2>ref[1]?'⚠️ 高于市场带：需降成本或走高端定位':'落在市场带内：可行');
+}
+function card(k,v,d){ return `<div class="card"><div class="k">${k}</div><div class="v">${v}</div><div class="d">${d}</div></div>`; }
+
+function barChart(elId, bars){
+  const W=880,H=190,L=10,R=10,T=24,B=30;
+  const max=Math.max(...bars.map(b=>b.value))*1.15||1;
+  const bw=(W-L-R)/bars.length;
+  let svg=`<svg viewBox="0 0 ${W} ${H}" width="100%" style="min-width:560px" xmlns="http://www.w3.org/2000/svg">`;
+  bars.forEach((b,i)=>{
+    const x=L+i*bw+bw*0.18, w=bw*0.64;
+    if(b.banned){
+      svg+=`<rect x="${x}" y="${T}" width="${w}" height="${H-T-B}" fill="#fee2e2" rx="8"/>`+
+           `<text x="${x+w/2}" y="${(H-B+T)/2}" text-anchor="middle" font-size="13" fill="#dc2626" font-weight="700">禁止进口</text>`;
+    } else {
+      const h=(H-T-B)*b.value/max, y=H-B-h;
+      svg+=`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${b.best?'#16a34a':'#f59e0b'}" rx="8" opacity="${b.best?1:0.75}"/>`+
+           `<text x="${x+w/2}" y="${y-7}" text-anchor="middle" font-size="12.5" font-weight="700" fill="#374151">${fmtINR(b.value)}/台</text>`;
+    }
+    svg+=`<text x="${x+w/2}" y="${H-10}" text-anchor="middle" font-size="12" fill="#6b7280">${b.label}${b.best?' ✓':''}</text>`;
+  });
+  svg+='</svg>';
+  document.getElementById(elId).innerHTML=svg;
+}
+function exportCalc(){
+  const p=currentProd(), sc=scen();
+  let csv='﻿成本构成,CBU,SKD,CKD\n';
+  const ms=['cbu','skd','ckd'].map(k=>computeMode(p,k,sc));
+  const lines=[['CIF卢比',m=>Math.round(m.cifINR)],['BCD',m=>Math.round(m.bcd)],['SWS',m=>Math.round(m.sws)],
+    ['IGST',m=>Math.round(m.igst)],['组装费',m=>m.asm],['认证摊销',m=>Math.round(m.certU)],
+    ['现金落地成本',m=>Math.round(m.cash)],['净落地成本',m=>Math.round(m.net)]];
+  lines.forEach(([l,f])=>{ csv+=l+','+ms.map(m=>m.banned?'禁止':f(m)).join(',')+'\n'; });
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
+  a.download=`CostLens印度落地成本_${p.name}.csv`; a.click();
+}
+
+/* ═══════════ TAB2 汇率图 ═══════════ */
+const FX_LABELS=(()=>{const o=[];let y=2024,m=7;for(let i=0;i<24;i++){o.push(y+'.'+String(m).padStart(2,'0'));m++;if(m>12){m=1;y++;}}return o;})();
+const FX_ANCHORS={'2024.07':83.7,'2025.02':87.0,'2025.06':85.6,'2026.01':90.5,'2026.05':96.0,'2026.06':95.26};
+function fxSeries(){
+  const idx=FX_LABELS.map(l=>FX_ANCHORS[l]!==undefined?FX_ANCHORS[l]:null);
+  const known=[]; idx.forEach((v,i)=>{if(v!=null)known.push(i);});
+  const out=idx.slice();
+  for(let i=0;i<out.length;i++){
+    if(out[i]!=null)continue;
+    const prev=known.filter(k=>k<i).pop(), next=known.find(k=>k>i);
+    if(prev!=null&&next!=null) out[i]=idx[prev]+(idx[next]-idx[prev])*(i-prev)/(next-prev);
+    else if(prev!=null) out[i]=idx[prev];
+  }
+  return out;
+}
+function renderFx(){
+  document.getElementById('fx-cny-d').textContent=S.fx.usdcny.toFixed(2);
+  document.getElementById('fx-cnyinr').textContent=(S.fx.usdinr/S.fx.usdcny).toFixed(2);
+  const dots=FX_LABELS.map(l=>FX_ANCHORS[l]!==undefined);
+  lineChartFx('ch-fx','lg-fx',{labels:FX_LABELS,
+    series:[{name:'USD/INR（圆点=实测锚点，虚线=插值）',color:'#b45309',values:fxSeries(),dash:true,dots}],
+    yFmt:v=>v.toFixed(1)});
+}
+function lineChartFx(elId,lgId,cfg){
+  const W=900,H=280,L=52,R=16,T=16,B=36,n=cfg.labels.length;
+  let vals=[]; cfg.series.forEach(s=>s.values.forEach(v=>{if(v!=null)vals.push(v);}));
+  let ymin=Math.min(...vals),ymax=Math.max(...vals);
+  const pad=(ymax-ymin)*0.1||1; ymin-=pad; ymax+=pad;
+  const X=i=>L+(W-L-R)*(n===1?0:i/(n-1)), Y=v=>T+(H-T-B)*(1-(v-ymin)/(ymax-ymin));
+  let svg=`<svg viewBox="0 0 ${W} ${H}" width="100%" style="min-width:640px" xmlns="http://www.w3.org/2000/svg">`;
+  for(let i=0;i<=4;i++){const v=ymin+(ymax-ymin)*i/4,y=Y(v);
+    svg+=`<line x1="${L}" y1="${y}" x2="${W-R}" y2="${y}" stroke="#eef1f6"/>`+
+         `<text x="${L-6}" y="${y+4}" text-anchor="end" font-size="10.5" fill="#9ca3af">${cfg.yFmt(v)}</text>`;}
+  const step=Math.ceil(n/9);
+  for(let i=0;i<n;i+=step)
+    svg+=`<text x="${X(i)}" y="${H-12}" text-anchor="middle" font-size="10.5" fill="#9ca3af">${cfg.labels[i]}</text>`;
+  cfg.series.forEach(s=>{
+    let d='',pen=false;
+    for(let i=0;i<n;i++){const v=s.values[i]; if(v==null){pen=false;continue;}
+      d+=(pen?'L':'M')+X(i).toFixed(1)+' '+Y(v).toFixed(1)+' '; pen=true;}
+    svg+=`<path d="${d}" fill="none" stroke="${s.color}" stroke-width="2.2" ${s.dash?'stroke-dasharray="6 4"':''}/>`;
+    if(s.dots) for(let i=0;i<n;i++) if(s.dots[i]&&s.values[i]!=null)
+      svg+=`<circle cx="${X(i)}" cy="${Y(s.values[i])}" r="4" fill="${s.color}"/>`;
+  });
+  svg+='</svg>';
+  document.getElementById(elId).innerHTML=svg;
+  document.getElementById(lgId).innerHTML=cfg.series.map(s=>`<span><i style="background:${s.color}"></i>${s.name}</span>`).join('');
+}
+
+/* ═══════════ TAB5 新闻雷达 ═══════════ */
+const NEWS_TOPICS=[
+  { key:'tariff', name:'关税与进口政策', q:'India import duty appliances customs' },
+  { key:'bis', name:'BIS / QCO 认证动态', q:'India BIS QCO quality control order electronics' },
+  { key:'market', name:'家电市场动态', q:'India air conditioner refrigerator market sales' },
+  { key:'inr', name:'卢比汇率', q:'Indian rupee USD exchange rate' },
+];
+function gnRss(q){ return 'https://news.google.com/rss/search?q='+encodeURIComponent(q)+'&hl=en-IN&gl=IN&ceid=IN:en'; }
+function gnLink(q){ return 'https://news.google.com/search?q='+encodeURIComponent(q)+'&hl=en-IN&gl=IN&ceid=IN:en'; }
+function renderNewsShell(){
+  document.getElementById('news-grid').innerHTML = NEWS_TOPICS.map(t=>
+    `<div class="panel" style="margin-bottom:0;">
+      <h3>${t.name}</h3>
+      <div id="news-${t.key}" style="min-height:60px;"><div style="font-size:12.5px;color:var(--muted);">尚未加载——点上方「刷新新闻」，或直接点下面的直达链接。</div></div>
+      <div class="src">直达（始终可用）：<a href="${gnLink(t.q)}" target="_blank">Google News 实时检索</a> · <a href="https://economictimes.indiatimes.com/industry/cons-products/durables" target="_blank">经济时报·耐用消费品版</a> · <a href="https://www.business-standard.com/industry/news" target="_blank">Business Standard 产业版</a></div>
+    </div>`).join('');
+}
+async function loadAllNews(){
+  const st=document.getElementById('news-status');
+  st.textContent='抓取中…（经公共代理，约 5–15 秒）';
+  let ok=0;
+  await Promise.all(NEWS_TOPICS.map(async t=>{
+    const el=document.getElementById('news-'+t.key);
+    try{
+      const res=await fetch('https://api.allorigins.win/raw?url='+encodeURIComponent(gnRss(t.q)),{signal:AbortSignal.timeout(15000)});
+      if(!res.ok) throw new Error('proxy '+res.status);
+      const xml=new DOMParser().parseFromString(await res.text(),'text/xml');
+      const items=[...xml.querySelectorAll('item')].slice(0,5);
+      if(!items.length) throw new Error('empty');
+      el.innerHTML=items.map(it=>{
+        const title=it.querySelector('title')?.textContent||'';
+        const link=it.querySelector('link')?.textContent||'#';
+        const date=(it.querySelector('pubDate')?.textContent||'').slice(0,16);
+        return `<div class="news-item"><a href="${link}" target="_blank">${title}</a><div class="meta">${date}</div></div>`;
+      }).join('');
+      ok++;
+    }catch(e){
+      el.innerHTML=`<div style="font-size:12.5px;color:var(--amber);">⚠️ 自动抓取失败（${String(e.message||e).slice(0,40)}）。当前网络可能无法访问代理/Google——请用下方「直达链接」，内容相同。</div>`;
+    }
+  }));
+  st.textContent= ok? `已更新 ${ok}/${NEWS_TOPICS.length} 个主题 · ${new Date().toLocaleTimeString('zh-CN')}` : '本网络环境下自动抓取不可用——请使用各主题下方的直达链接。';
+}
+
+/* ═══════════ TAB6 我的数据与参数 ═══════════ */
+function renderProdsTable(){
+  const tb=document.querySelector('#md-prods tbody'); tb.innerHTML='';
+  S.prods.forEach((p,i)=>{
+    tb.innerHTML+=`<tr>
+      <td><input type="text" value="${p.name}" onchange="S.prods[${i}].name=this.value; renderProdSelect(); renderCalc();"></td>
+      <td><select onchange="S.prods[${i}].cat=this.value; renderProdSelect(); renderCalc();">${Object.entries(S.cats).map(([k,c])=>`<option value="${k}" ${k===p.cat?'selected':''}>${c.name}</option>`).join('')}</select></td>
+      <td><input type="number" value="${p.fob}" onchange="S.prods[${i}].fob=parseFloat(this.value)||1; renderCalc();"></td>
+      <td><select onchange="S.prods[${i}].cur=this.value; renderCalc();"><option ${p.cur==='USD'?'selected':''}>USD</option><option ${p.cur==='CNY'?'selected':''}>CNY</option></select></td>
+      <td><input type="number" value="${p.vol}" onchange="S.prods[${i}].vol=parseInt(this.value)||1; renderCalc();"></td>
+      <td><button class="del" onclick="S.prods.splice(${i},1); renderProdsTable(); renderProdSelect(); renderCalc();">✕</button></td></tr>`;
+  });
+}
+function addProd(){ S.prods.push({name:'新产品',cat:'ac',fob:150,cur:'USD',vol:10000}); renderProdsTable(); renderProdSelect(); }
+function importProds(){
+  const txt=document.getElementById('md-paste').value.trim(); if(!txt) return;
+  let added=0;
+  txt.split(/\n+/).forEach(line=>{
+    const p=line.split(/[,;\t]+/).map(x=>x.trim());
+    if(p.length>=5 && S.cats[p[1]] && parseFloat(p[2])>0){
+      S.prods.push({name:p[0],cat:p[1],fob:parseFloat(p[2]),cur:p[3]==='CNY'?'CNY':'USD',vol:parseInt(p[4])||1000}); added++;
+    }
+  });
+  renderProdsTable(); renderProdSelect(); renderCalc();
+  document.getElementById('save-status').textContent=`已导入 ${added} 行`;
+}
+function renderParams(){
+  let html='<table><thead><tr><th>品类</th><th>模式</th><th>BCD %</th><th>IGST %</th><th>海运 $/台</th><th>组装 ₹/台</th><th>认证费 ₹（每型号族）</th></tr></thead><tbody>';
+  Object.entries(S.cats).forEach(([ck,c])=>{
+    ['cbu','skd','ckd'].forEach((mk,j)=>{
+      const m=c.modes[mk];
+      html+=`<tr>${j===0?`<td rowspan="3"><b>${c.name}</b><br><span class="range" style="font-size:11px;color:var(--muted)">HS ${c.hs}</span></td>`:''}
+        <td>${MODE_NAMES[mk]}${m.banned?' <span class="tag ban">禁</span>':''}</td>
+        <td><input type="number" step="0.5" value="${m.bcd}" onchange="S.cats['${ck}'].modes['${mk}'].bcd=parseFloat(this.value)||0; renderCalc();"></td>
+        <td><input type="number" step="1" value="${m.igst}" onchange="S.cats['${ck}'].modes['${mk}'].igst=parseFloat(this.value)||0; renderCalc();"></td>
+        <td><input type="number" step="0.5" value="${m.freight}" onchange="S.cats['${ck}'].modes['${mk}'].freight=parseFloat(this.value)||0; renderCalc();"></td>
+        <td><input type="number" step="10" value="${m.asm}" onchange="S.cats['${ck}'].modes['${mk}'].asm=parseFloat(this.value)||0; renderCalc();"></td>
+        <td><input type="number" step="10000" value="${m.cert}" style="width:120px" onchange="S.cats['${ck}'].modes['${mk}'].cert=parseFloat(this.value)||0; renderCalc();"></td></tr>`;
+    });
+  });
+  html+='</tbody></table>';
+  document.getElementById('md-params').innerHTML=html;
+}
+function updFx(){
+  S.fx.usdinr=parseFloat(document.getElementById('p-usdinr').value)||95.26;
+  S.fx.usdcny=parseFloat(document.getElementById('p-usdcny').value)||7.10;
+  renderCalc(); renderFx();
+}
+function saveScheme(){
+  localStorage.setItem('costlens-india-pro', JSON.stringify(S));
+  document.getElementById('save-status').textContent='✓ 已保存到本机浏览器（'+new Date().toLocaleTimeString('zh-CN')+'）';
+}
+function loadScheme(){
+  const raw=localStorage.getItem('costlens-india-pro');
+  if(!raw){ document.getElementById('save-status').textContent='没有找到已存方案'; return; }
+  S=JSON.parse(raw); initAll();
+  document.getElementById('save-status').textContent='✓ 已读取本机方案';
+}
+function resetAll(){
+  S=JSON.parse(JSON.stringify(DEFAULTS)); initAll();
+  document.getElementById('save-status').textContent='已恢复默认参数';
+}
+
+/* ═══════════ 初始化 ═══════════ */
+function showTab(id,btn){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  if(id==='fx') renderFx();
+}
+function initAll(){
+  document.getElementById('p-usdinr').value=S.fx.usdinr;
+  document.getElementById('p-usdcny').value=S.fx.usdcny;
+  renderProdSelect(); renderProdsTable(); renderParams(); renderNewsShell(); renderCalc(); renderFx();
+}
+initAll();
+</script>
+</body>
+</html>
