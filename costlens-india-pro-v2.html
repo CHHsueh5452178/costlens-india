@@ -180,6 +180,21 @@
   </div>
 
   <div class="panel">
+    <h2>为什么是这个推荐？（政策依据 + 成本逻辑，逐条可核验）</h2>
+    <div class="sub">推荐不是拍脑袋：下面每一条都给出政策原文出处或可修改的成本假设。换产品、改数量、拖情景滑块，这段解释会跟着重写。</div>
+    <div id="reco-text"></div>
+  </div>
+
+  <div class="panel">
+    <h2>规模门槛 · 盈亏平衡分析（为什么不是无脑 CKD）</h2>
+    <div class="sub">CKD 关税最低，但要养组装线和团队（年固定成本）；CBU/SKD 固定投入小但每台变动成本高。<b>年销量决定哪种模式真正便宜</b>——下图为各模式的「年总成本 = 每台变动成本 × 数量 + 年固定成本」，交点就是模式切换的临界量。竖虚线是您当前的年销量。</div>
+    <div class="legend" id="lg-be"></div>
+    <div class="chart-wrap" id="ch-be"></div>
+    <div id="be-text" style="margin-top:8px;"></div>
+    <div class="src">年固定成本与认证费为行业典型估计值（认证按3年摊销），在【📥 我的数据与参数】中可改为您的实际数字——改完此图实时重算。</div>
+  </div>
+
+  <div class="panel">
     <h2>终端定价参考</h2>
     <div class="sub">以最优模式的净落地成本为基础，加上渠道与品牌毛利（可拖动），看建议零售价落在印度市场什么位置。</div>
     <div class="slider-item" style="max-width:420px;">
@@ -327,30 +342,31 @@
 const DEFAULTS = {
   fx: { usdinr: 95.26, usdcny: 7.10 },
   cats: {
+    /* fixed = 该模式的年固定成本(₹)：CBU=合规/仓储等贸易开销；SKD/CKD=组装线折旧+厂房+最低团队（估计值，全部可改） */
     ac:       { name:'分体空调',     hs:'8415', retailRef:[28000,38000],
-      modes:{ cbu:{bcd:20, igst:28, freight:18, asm:0,   cert:2500000, banned:true},
-              skd:{bcd:15, igst:18, freight:15, asm:300, cert:2500000},
-              ckd:{bcd:10, igst:18, freight:12, asm:600, cert:2500000} } },
+      modes:{ cbu:{bcd:20, igst:28, freight:18, asm:0,   cert:2500000, fixed:2000000,  banned:true},
+              skd:{bcd:15, igst:18, freight:15, asm:300, cert:2500000, fixed:12000000},
+              ckd:{bcd:10, igst:18, freight:12, asm:600, cert:2500000, fixed:30000000} } },
     fridgeFF: { name:'冰箱·风冷无霜', hs:'8418', retailRef:[35000,55000],
-      modes:{ cbu:{bcd:20, igst:28, freight:22, asm:0,   cert:1800000},
-              skd:{bcd:15, igst:18, freight:16, asm:350, cert:1800000},
-              ckd:{bcd:10, igst:18, freight:13, asm:650, cert:1800000} } },
+      modes:{ cbu:{bcd:20, igst:28, freight:22, asm:0,   cert:1800000, fixed:2000000},
+              skd:{bcd:15, igst:18, freight:16, asm:350, cert:1800000, fixed:10000000},
+              ckd:{bcd:10, igst:18, freight:13, asm:650, cert:1800000, fixed:45000000} } },
     fridgeDC: { name:'冰箱·单门直冷', hs:'8418', retailRef:[12000,20000],
-      modes:{ cbu:{bcd:20, igst:28, freight:14, asm:0,   cert:1800000},
-              skd:{bcd:15, igst:18, freight:10, asm:250, cert:1800000},
-              ckd:{bcd:10, igst:18, freight:8,  asm:450, cert:1800000} } },
+      modes:{ cbu:{bcd:20, igst:28, freight:14, asm:0,   cert:1800000, fixed:2000000},
+              skd:{bcd:15, igst:18, freight:10, asm:250, cert:1800000, fixed:8000000},
+              ckd:{bcd:10, igst:18, freight:8,  asm:450, cert:1800000, fixed:20000000} } },
     washerFL: { name:'洗衣机·滚筒',   hs:'8450', retailRef:[25000,40000],
-      modes:{ cbu:{bcd:20, igst:28, freight:12, asm:0,   cert:1500000},
-              skd:{bcd:15, igst:18, freight:10, asm:250, cert:1500000},
-              ckd:{bcd:10, igst:18, freight:8,  asm:450, cert:1500000} } },
+      modes:{ cbu:{bcd:20, igst:28, freight:12, asm:0,   cert:1500000, fixed:2000000},
+              skd:{bcd:15, igst:18, freight:10, asm:250, cert:1500000, fixed:8000000},
+              ckd:{bcd:10, igst:18, freight:8,  asm:450, cert:1500000, fixed:30000000} } },
     washerTL: { name:'洗衣机·波轮',   hs:'8450', retailRef:[9000,18000],
-      modes:{ cbu:{bcd:20, igst:28, freight:8,  asm:0,   cert:1500000},
-              skd:{bcd:15, igst:18, freight:6,  asm:180, cert:1500000},
-              ckd:{bcd:10, igst:18, freight:5,  asm:350, cert:1500000} } },
+      modes:{ cbu:{bcd:20, igst:28, freight:8,  asm:0,   cert:1500000, fixed:2000000},
+              skd:{bcd:15, igst:18, freight:6,  asm:180, cert:1500000, fixed:6000000},
+              ckd:{bcd:10, igst:18, freight:5,  asm:350, cert:1500000, fixed:15000000} } },
     purifier: { name:'空气净化器',    hs:'842139', retailRef:[8000,25000],
-      modes:{ cbu:{bcd:7.5, igst:18, freight:4,  asm:0,   cert:800000},
-              skd:{bcd:7.5, igst:18, freight:3.5,asm:120, cert:800000},
-              ckd:{bcd:5,   igst:18, freight:3,  asm:250, cert:800000} } },
+      modes:{ cbu:{bcd:7.5, igst:18, freight:4,  asm:0,   cert:800000, fixed:2000000},
+              skd:{bcd:7.5, igst:18, freight:3.5,asm:120, cert:800000, fixed:4000000},
+              ckd:{bcd:5,   igst:18, freight:3,  asm:250, cert:800000, fixed:10000000} } },
   },
   prods: [
     { name:'1.5匹变频空调',      cat:'ac',       fob:180, cur:'USD', vol:50000 },
@@ -389,12 +405,43 @@ function computeMode(prod, modeKey, sc){
   const bcd = cifINR * bcdRate;
   const sws = bcd * 0.10;
   const igst = (cifINR + bcd + sws) * m.igst/100;
-  const certU = m.cert / Math.max(1, prod.vol);
+  const vol = Math.max(1, prod.vol);
+  const certU = m.cert/3 / vol;                 // 认证费按3年摊销
+  const fixedU = (m.fixed||0) / vol;            // 年固定成本（线/厂房/团队 或 贸易合规开销）
   const asm = m.asm || 0;
-  const cash = cifINR + bcd + sws + igst + asm + certU;
-  const net = cash - (sc.igstCredit ? igst : 0);
-  return { banned: !!m.banned, fobUSD, frUSD, cifINR, bcd, sws, igst, asm, certU, cash, net, usdinr,
+  const igstNet = sc.igstCredit ? 0 : igst;
+  const varU = cifINR + bcd + sws + igstNet + asm;   // 每台变动成本（随量走）
+  const annualFixed = m.cert/3 + (m.fixed||0);       // 年固定成本合计
+  const cash = cifINR + bcd + sws + igst + asm + certU + fixedU;
+  const net = varU + certU + fixedU;
+  return { banned: !!m.banned, fobUSD, frUSD, cifINR, bcd, sws, igst, asm, certU, fixedU,
+           varU, annualFixed, cash, net, usdinr,
            netUSD: net/usdinr, netCNY: net/usdinr*S.fx.usdcny };
+}
+/* 各模式年总成本 = varU×量 + annualFixed → 求两两盈亏平衡点与分段最优 */
+function beSegments(prod, sc){
+  const ms = ['cbu','skd','ckd']
+    .map(k=>({key:k, r:computeMode(prod,k,sc)}))
+    .filter(m=>!m.r.banned);
+  const total = (m,v)=> m.r.varU*v + m.r.annualFixed;
+  const cross = [];
+  for(let i=0;i<ms.length;i++) for(let j=i+1;j<ms.length;j++){
+    const dv = ms[i].r.varU - ms[j].r.varU;
+    if(Math.abs(dv) > 1e-6){
+      const v = (ms[j].r.annualFixed - ms[i].r.annualFixed) / dv;
+      if(v > 0 && v < 10000000) cross.push(Math.round(v));
+    }
+  }
+  const pts = [...new Set(cross)].sort((a,b)=>a-b);
+  const bounds = [0, ...pts, Math.max(prod.vol*2.2, (pts[pts.length-1]||0)*1.4, 20000)];
+  const segs = [];
+  for(let i=0;i<bounds.length-1;i++){
+    const mid = (bounds[i]+bounds[i+1])/2;
+    const best = ms.reduce((a,b)=> total(a,mid)<=total(b,mid)?a:b);
+    if(segs.length && segs[segs.length-1].mode===best.key) segs[segs.length-1].to = bounds[i+1];
+    else segs.push({from:bounds[i], to:bounds[i+1], mode:best.key});
+  }
+  return { ms, segs, maxV: bounds[bounds.length-1] };
 }
 function currentProd(){ return S.prods[parseInt(document.getElementById('c-prod').value)||0] || S.prods[0]; }
 
@@ -449,7 +496,8 @@ function renderCalc(){
     ['福利附加 SWS（BCD×10%）', m=>fmtINR(m.sws)],
     ['IGST', m=>fmtINR(m.igst)+(sc.igstCredit?'（可抵扣）':'')],
     ['本地组装费 <span class="badge est">估计值</span>', m=>m.asm?fmtINR(m.asm):'—'],
-    ['BIS认证摊销（费用÷年量）<span class="badge est">估计值</span>', m=>fmtINR(m.certU)],
+    ['BIS认证摊销（3年÷年量）<span class="badge est">估计值</span>', m=>fmtINR(m.certU)],
+    ['年固定成本摊销（线/厂房/团队÷年量）<span class="badge est">估计值</span>', m=>fmtINR(m.fixedU)],
     ['<b>现金落地成本</b>', m=>'<b>'+fmtINR(m.cash)+'</b>'],
     ['<b>净落地成本（抵扣后）</b>', m=>'<b>'+fmtINR(m.net)+'</b>'],
     ['折合人民币/台', m=>'¥'+fmtN(m.netCNY)],
@@ -479,6 +527,10 @@ function renderCalc(){
   document.getElementById('calc-src').innerHTML =
     `📊 税率出处（点击核验）：整机 BCD 20%（2018年起，<a href="https://www.indiatvnews.com/news/india-govt-hikes-import-duties-on-19-items-air-conditioners-fridge-washing-machine-to-get-costlier-from-tomorrow-465647" target="_blank">India TV 报道</a>）· 压缩机等零部件 10%（同上）· 空净 BCD 7.5%+IGST 18%（<a href="https://www.eximguru.com/indian-customs-duty/84213920-other-air-purifiers-or-cleaners.aspx" target="_blank">EximGuru HS 84213920</a>）· 现行税率最终确认：<a href="https://www.cbic.gov.in/entities/customs-tariff" target="_blank">CBIC 官方关税表</a> · 空调 CBU 禁令：<a href="https://www.coolingpost.com/world-news/india-bans-split-air-conditioner-imports/" target="_blank">DGFT 2020 通告</a>。SKD/CKD 行的税率为零部件税率的<b>简化加权代表值</b>（实际按零件逐项归类），上量前请做正式归类预裁定。`;
 
+  // 推荐理由 + 盈亏平衡
+  renderReco(p, sc, modes, best);
+  renderBE(p, sc);
+
   // 定价
   const mrp = best.r.net*(1+sc.mk)*1.18; // 含 GST 18%（白电 28% 时下调？展示用 IGST 同档）
   const gstRate = S.cats[p.cat].modes.cbu.igst/100;
@@ -490,6 +542,77 @@ function renderCalc(){
     card('市场零售参考带 <span class="badge est">估计值</span>', `${fmtINR(ref[0])} – ${fmtINR(ref[1])}`, mrp2<ref[0]?'低于市场带：有定价/利润空间':mrp2>ref[1]?'⚠️ 高于市场带：需降成本或走高端定位':'落在市场带内：可行');
 }
 function card(k,v,d){ return `<div class="card"><div class="k">${k}</div><div class="v">${v}</div><div class="d">${d}</div></div>`; }
+
+/* ── 推荐理由（逐条、带出处、随参数实时重写） ── */
+function renderReco(p, sc, modes, best){
+  const cat = S.cats[p.cat];
+  const res = {}; modes.forEach(m=>{ res[m.key]=m.r; });
+  const { segs } = beSegments(p, sc);
+  const segTxt = segs.map(s=>{
+    const to = s.to>=1000000 ? '以上' : '–'+fmtN(s.to)+'台';
+    return `<b>${fmtN(s.from)}${s.to>=1000000?'台以上':'台'+to}</b>：${MODE_NAMES[s.mode]}`;
+  }).join('；');
+  const li = [];
+  // ① 政策硬约束
+  if(cat.modes.cbu.banned){
+    li.push(`<b>① 政策硬约束（没有整机选项）：</b>印度 DGFT 2020年10月15日通告禁止进口含 HCFC/HFC 制冷剂的空调整机（HS 84151010/84151090），窗机分体机均适用，至今有效——所以本品类<b>不存在"先 CBU 试水"的路径</b>，只能在 SKD 与 CKD 之间选。 <a href="https://www.coolingpost.com/world-news/india-bans-split-air-conditioner-imports/" target="_blank">[禁令报道]</a> <a href="https://www.dgft.gov.in/CP/?opt=notification" target="_blank">[DGFT 通告库]</a>`);
+  } else {
+    li.push(`<b>① 政策面：</b>本品类无进口禁令，三种模式都合法可行——选择纯粹由成本与规模决定。整机关税 ${cat.modes.cbu.bcd}% 源于2018年9月印度将白电整机 BCD 由10%上调至20%（空净例外，仅7.5%）。 <a href="https://www.indiatvnews.com/news/india-govt-hikes-import-duties-on-19-items-air-conditioners-fridge-washing-machine-to-get-costlier-from-tomorrow-465647" target="_blank">[2018调税报道]</a> <a href="https://www.cbic.gov.in/entities/customs-tariff" target="_blank">[CBIC 现行税率核验]</a>`);
+  }
+  // ② 关税差
+  const hiK = cat.modes.cbu.banned ? 'skd' : 'cbu';
+  if(res[hiK] && res.ckd && !res[hiK].banned){
+    const dDuty = (res[hiK].bcd+res[hiK].sws) - (res.ckd.bcd+res.ckd.sws);
+    li.push(`<b>② 关税差是每一台的真金白银：</b>${MODE_NAMES[hiK]}按 BCD ${cat.modes[hiK].bcd}% 计每台关税+附加 ₹${fmtN(res[hiK].bcd+res[hiK].sws)}；CKD 按零部件税率约 ${cat.modes.ckd.bcd}% 计 ₹${fmtN(res.ckd.bcd+res.ckd.sws)}——<b>每台差 ₹${fmtN(dDuty)}</b>，这是印度刻意设计的税率梯度（鼓励本地组装的产业政策，配套 PLI 零部件补贴）。 <a href="https://pib.gov.in/" target="_blank">[PLI 官方发布]</a>`);
+  }
+  // ③ 海运
+  li.push(`<b>③ 海运密度：</b>散件装柜密度比整机高约 30–40%，故运费假设为 CBU $${cat.modes.cbu.freight} / SKD $${cat.modes.skd.freight} / CKD $${cat.modes.ckd.freight} 每台 <span class="badge est">估计值</span>——请用货代实价替换（【📥参数】页），不影响结论方向但影响临界量。`);
+  // ④ 规模门槛
+  li.push(`<b>④ 规模门槛（CKD 不是免费的）：</b>CKD 要养组装线与团队（本模型估 ₹${fmtN((cat.modes.ckd.fixed||0)/1000000)}百万/年）、SKD ₹${fmtN((cat.modes.skd.fixed||0)/1000000)}百万/年，认证费按3年摊销。把固定成本算进去后，分段最优是：${segTxt}。<b>您当前 ${fmtN(p.vol)} 台/年 → ${MODE_NAMES[best.key]}</b>。数量改一下，推荐可能就变——这正是"按您的量身定制"而非"无脑CKD"。`);
+  // ⑤ 品类特定合规
+  if(p.cat==='ac') li.push(`<b>⑤ 本品类合规要点：</b>压缩机与温控器件已纳入 QCO（2025年修订）——CKD 进口压缩机也要 BIS 认证，倒逼用已认证供应商（GMCC/Highly 在印产能）或本地采购；整机需 BEE 星级（ISEER）能效标签。 <a href="https://www.elitasrcs.com/quality-control-orders/bis-qco-notification-for-air-conditioner-and-its-related-parts-hermetic-compressors-and-temperature-sensing-controls" target="_blank">[压缩机QCO]</a> <a href="https://www.beestarlabel.com/" target="_blank">[BEE数据库]</a>`);
+  if(p.cat==='fridgeFF'||p.cat==='fridgeDC'||p.cat==='washerFL'||p.cat==='washerTL') li.push(`<b>⑤ 本品类合规要点：</b>家用电器安全 QCO 2024（IS 302系列）已于2025年3月起分阶段强制——无论哪种模式，整机都需 BIS 认证（4–8个月）+ 能效标签（适用品类）。 <a href="https://absoluteveritas.com/bis-qco-for-safety-of-household-commercial-and-similar-electrical-appliances/" target="_blank">[QCO 2024时间表]</a>`);
+  if(p.cat==='purifier') li.push(`<b>⑤ 本品类合规要点：</b>空净走 BIS CRS 注册（比 FMCS 快）+ 授权印度代表（AIR），无禁令、低关税（HS 84213920 BCD 7.5%）——这是唯一"中国整机直发"经济性成立的品类，小米即此打法。 <a href="https://www.eximguru.com/indian-customs-duty/84213920-other-air-purifiers-or-cleaners.aspx" target="_blank">[税率出处]</a>`);
+  // ⑥ 执行路径
+  if(best.key!=='cbu') li.push(`<b>⑥ 执行路径（PN3 下怎么落地）：</b>Press Note 3 使中资自建/控股工厂需印度政府审批且长期停滞——${MODE_NAMES[best.key]}的现实做法是<b>委托已持证的印度 ODM</b>：安珀 Amber Enterprises (NSE: AMBER)、迪克森 Dixon Technologies (DIXON)、PG Electroplast (PGEL)、EPACK——均为上市公司，签约前财报免费尽调。 <a href="https://www.screener.in/" target="_blank">[Screener 财报]</a> <a href="https://www.manakonline.in/" target="_blank">[查持证]</a>`);
+  else li.push(`<b>⑥ 执行路径：</b>CBU 模式下您是进口商=法定"生产者"：需提前完成 BIS（CRS/FMCS）、能效标签（适用时）与 E-waste EPR 注册，认证 4–8 个月先行启动，再按销售季倒排海运。`);
+  document.getElementById('reco-text').innerHTML =
+    '<ul style="margin-left:18px; line-height:1.9; font-size:13px;">' +
+    li.map(x=>`<li style="margin-bottom:9px;">${x}</li>`).join('') + '</ul>';
+}
+
+/* ── 盈亏平衡图 ── */
+const MODE_COLORS = { cbu:'#dc2626', skd:'#2563eb', ckd:'#16a34a' };
+function renderBE(p, sc){
+  const { ms, segs, maxV } = beSegments(p, sc);
+  const W=900,H=280,L=70,R=16,T=14,B=38;
+  const total=(m,v)=>(m.r.varU*v+m.r.annualFixed);
+  const ymax = Math.max(...ms.map(m=>total(m,maxV)))*1.05;
+  const X=v=>L+(W-L-R)*v/maxV, Y=c=>T+(H-T-B)*(1-c/ymax);
+  let svg=`<svg viewBox="0 0 ${W} ${H}" width="100%" style="min-width:660px" xmlns="http://www.w3.org/2000/svg">`;
+  for(let i=0;i<=4;i++){ const c=ymax*i/4, y=Y(c);
+    svg+=`<line x1="${L}" y1="${y}" x2="${W-R}" y2="${y}" stroke="#eef1f6"/>`+
+         `<text x="${L-6}" y="${y+4}" text-anchor="end" font-size="10.5" fill="#9ca3af">₹${(c/10000000).toFixed(1)}Cr</text>`; }
+  for(let i=0;i<=6;i++){ const v=maxV*i/6;
+    svg+=`<text x="${X(v)}" y="${H-12}" text-anchor="middle" font-size="10.5" fill="#9ca3af">${fmtN(v)}</text>`; }
+  // 当前销量竖线
+  svg+=`<line x1="${X(p.vol)}" y1="${T}" x2="${X(p.vol)}" y2="${H-B}" stroke="#b45309" stroke-dasharray="5 4" stroke-width="1.5"/>`+
+       `<text x="${X(p.vol)+5}" y="${T+13}" font-size="11" fill="#b45309" font-weight="700">您当前 ${fmtN(p.vol)}台/年</text>`;
+  ms.forEach(m=>{
+    let d='';
+    for(let i=0;i<=50;i++){ const v=maxV*i/50;
+      d+=(i?'L':'M')+X(v).toFixed(1)+' '+Y(total(m,v)).toFixed(1)+' '; }
+    svg+=`<path d="${d}" fill="none" stroke="${MODE_COLORS[m.key]}" stroke-width="2.2"/>`;
+  });
+  svg+='</svg>';
+  document.getElementById('ch-be').innerHTML=svg;
+  document.getElementById('lg-be').innerHTML =
+    ms.map(m=>`<span><i style="background:${MODE_COLORS[m.key]}"></i>${MODE_NAMES[m.key]}（变动 ₹${fmtN(m.r.varU)}/台 + 固定 ₹${(m.r.annualFixed/10000000).toFixed(2)}Cr/年）</span>`).join('');
+  document.getElementById('be-text').innerHTML =
+    '<div class="note" style="margin:0;">📐 <b>分段最优：</b>' +
+    segs.map(s=>`年销量 ${fmtN(s.from)}${s.to>=1000000?' 台以上':' – '+fmtN(s.to)+' 台'} → <b style="color:${MODE_COLORS[s.mode]}">${MODE_NAMES[s.mode]}</b>`).join('　|　') +
+    '。<b>结论先于情绪：</b>量小用买的，量大用装的——临界点就是上面交叉的位置。</div>';
+}
 
 function barChart(elId, bars){
   const W=880,H=190,L=10,R=10,T=24,B=30;
@@ -516,7 +639,7 @@ function exportCalc(){
   let csv='﻿成本构成,CBU,SKD,CKD\n';
   const ms=['cbu','skd','ckd'].map(k=>computeMode(p,k,sc));
   const lines=[['CIF卢比',m=>Math.round(m.cifINR)],['BCD',m=>Math.round(m.bcd)],['SWS',m=>Math.round(m.sws)],
-    ['IGST',m=>Math.round(m.igst)],['组装费',m=>m.asm],['认证摊销',m=>Math.round(m.certU)],
+    ['IGST',m=>Math.round(m.igst)],['组装费',m=>m.asm],['认证摊销(3年)',m=>Math.round(m.certU)],['年固定成本摊销',m=>Math.round(m.fixedU)],
     ['现金落地成本',m=>Math.round(m.cash)],['净落地成本',m=>Math.round(m.net)]];
   lines.forEach(([l,f])=>{ csv+=l+','+ms.map(m=>m.banned?'禁止':f(m)).join(',')+'\n'; });
   const a=document.createElement('a');
@@ -692,7 +815,7 @@ function importProds(){
   document.getElementById('save-status').textContent=`已导入 ${added} 行`;
 }
 function renderParams(){
-  let html='<table><thead><tr><th>品类</th><th>模式</th><th>BCD %</th><th>IGST %</th><th>海运 $/台</th><th>组装 ₹/台</th><th>认证费 ₹（每型号族）</th></tr></thead><tbody>';
+  let html='<table><thead><tr><th>品类</th><th>模式</th><th>BCD %</th><th>IGST %</th><th>海运 $/台</th><th>组装 ₹/台</th><th>认证费 ₹（每型号族，3年摊销）</th><th>年固定成本 ₹（线/厂房/团队）</th></tr></thead><tbody>';
   Object.entries(S.cats).forEach(([ck,c])=>{
     ['cbu','skd','ckd'].forEach((mk,j)=>{
       const m=c.modes[mk];
@@ -702,7 +825,8 @@ function renderParams(){
         <td><input type="number" step="1" value="${m.igst}" onchange="S.cats['${ck}'].modes['${mk}'].igst=parseFloat(this.value)||0; renderCalc();"></td>
         <td><input type="number" step="0.5" value="${m.freight}" onchange="S.cats['${ck}'].modes['${mk}'].freight=parseFloat(this.value)||0; renderCalc();"></td>
         <td><input type="number" step="10" value="${m.asm}" onchange="S.cats['${ck}'].modes['${mk}'].asm=parseFloat(this.value)||0; renderCalc();"></td>
-        <td><input type="number" step="10000" value="${m.cert}" style="width:120px" onchange="S.cats['${ck}'].modes['${mk}'].cert=parseFloat(this.value)||0; renderCalc();"></td></tr>`;
+        <td><input type="number" step="10000" value="${m.cert}" style="width:110px" onchange="S.cats['${ck}'].modes['${mk}'].cert=parseFloat(this.value)||0; renderCalc();"></td>
+        <td><input type="number" step="500000" value="${m.fixed||0}" style="width:110px" onchange="S.cats['${ck}'].modes['${mk}'].fixed=parseFloat(this.value)||0; renderCalc();"></td></tr>`;
     });
   });
   html+='</tbody></table>';
@@ -825,10 +949,14 @@ const CL_KB = [
   q:'PLI 补贴是什么？',
   a:'印度白电 PLI 生产挂钩激励计划（约 ₹6,238 crore）补贴<b>空调零部件本地制造</b>（压缩机、铜管、换热器、电机等），这进一步强化了 CKD 本地组装的成本优势。政策动态第一手来源是 <a href="https://pib.gov.in/" target="_blank">PIB 政府新闻局</a>。',
   src:'出处：PIB / 商工部公开发布', rel:['modes','pn3']},
- {id:'modes', kw:['ckd','skd','模式','散件','组装','哪种方式','怎么进','进入方式','路径'],
+ {id:'modes', kw:['ckd','skd','模式','散件','组装','哪种方式','怎么进','进入方式','路径','怎么选'],
   q:'CKD/SKD/CBU 怎么选？',
-  a:'按品类选：<b>空调→CKD</b>（CBU 被禁）；<b>直冷冰箱→CKD/本地制造</b>（大众价格带扛不住整机税）；<b>风冷无霜冰箱→CBU 试水后转 SKD/CKD</b>；<b>波轮洗衣机→直接本地代工</b>；<b>滚筒→SKD 过渡到 CKD</b>；<b>空气净化器→CBU 直发</b>（唯一低关税品类）。【🧮 模拟器】可用您的实际 FOB 价和量逐一对比。',
-  src:'依据：DGFT 禁令 + CBIC 税率 + 行业实践（详见📄政策报告版）', tab:'calc', rel:['tariff','accbu','purifier']},
+  a:'选择由<b>三层逻辑</b>决定，不是一刀切：<b>①政策层</b>——空调含制冷剂整机被 DGFT 禁止（没有CBU选项）；其他品类三种都合法。<b>②税率层</b>——整机 BCD 20% vs 零部件约5–15%，印度刻意做了税率梯度+PLI补贴引导本地组装。<b>③规模层（最容易被忽略）</b>——CKD 要养组装线和团队（年固定成本），<b>量小时 CBU/SKD 反而更便宜</b>，量大才轮到 CKD。所以正确问法不是"哪种模式好"，而是"<b>在我的年销量下哪种模式好</b>"——【🧮 模拟器】的盈亏平衡图会给出您的临界量。',
+  src:'依据：DGFT 禁令 + CBIC 税率梯度 + 模拟器盈亏平衡计算（参数可改）', tab:'calc', rel:['breakeven','tariff','accbu']},
+ {id:'breakeven', kw:['盈亏平衡','临界','多少量','规模','breakeven','break even','门槛','量多大','值不值'],
+  q:'年销量多大才值得做 CKD？',
+  a:'公式：<b>临界量 = (CKD年固定成本 − 现模式年固定成本) ÷ (现模式每台变动成本 − CKD每台变动成本)</b>。直觉：CKD 每台省的钱（主要是关税差+运费差）要先"还清"组装线的年固定投入。以默认参数的 1.5匹空调为例：CKD 比 SKD 每台省约 ₹1,000+，但多 ₹1,800万/年固定成本 → 临界量约 1.7万台/年——低于它选 SKD，高于它选 CKD。<b>每个品类、每组参数的临界量都不同</b>，模拟器的「盈亏平衡」图实时画给您看（竖虚线=您当前的量）。',
+  src:'固定成本为可修改的估计值；改完图表实时重算', tab:'calc', rel:['modes','tariff']},
  {id:'freight', kw:['海运','运费','物流','集装箱','船期','货代'],
   q:'海运费怎么算？',
   a:'平台默认值为行业典型估计（按品类/模式 $3–22/台）：CKD 散件装柜密度比整机高 30–40%，所以折到每台更省。目的港：西线<b>那瓦舍瓦 Nhava Sheva (JNPT) / 蒙德拉 Mundra</b>，南线金奈 Chennai。<b>强烈建议</b>拿货代实时报价后到【📥 我的数据与参数】替换默认值。',
