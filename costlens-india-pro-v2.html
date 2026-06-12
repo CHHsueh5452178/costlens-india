@@ -118,6 +118,7 @@
   <button data-tab="region" onclick="showTab('region',this)">🗺 区域市场</button>
   <button data-tab="sources" onclick="showTab('sources',this)">📚 数据源导航</button>
   <button data-tab="cert" onclick="showTab('cert',this)">🧩 认证地图</button>
+  <button data-tab="asean" onclick="showTab('asean',this)">🌏 东盟路径·印尼</button>
   <button data-tab="news" onclick="showTab('news',this)">📰 新闻雷达</button>
   <button data-tab="mydata" onclick="showTab('mydata',this)">📥 我的数据与参数</button>
 </nav>
@@ -188,7 +189,15 @@
 
   <div class="panel">
     <h2>规模门槛 · 盈亏平衡分析（为什么不是无脑 CKD）</h2>
-    <div class="sub">CKD 关税最低，但要养组装线和团队（年固定成本）；CBU/SKD 固定投入小但每台变动成本高。<b>年销量决定哪种模式真正便宜</b>——下图为各模式的「年总成本 = 每台变动成本 × 数量 + 年固定成本」，交点就是模式切换的临界量。竖虚线是您当前的年销量。</div>
+    <div class="sub">CKD 关税最低，但要养组装线和团队（年固定成本）；CBU/SKD 固定投入小但每台变动成本高。<b>年销量决定哪种模式真正便宜</b>——下图为各模式的「年总成本 = 每台变动成本 × 数量 + 年固定成本」，交点就是模式切换的临界量。<b>拖动下面三个滑块亲手试</b>：把销量拖小，推荐会从 CKD 变回 SKD/CBU；把固定成本改成您的实际报价，临界点立刻移动。</div>
+    <div class="slider-grid" style="margin-bottom:10px;">
+      <div class="slider-item"><div class="lab"><span>年销量（拖动看模式怎么切换）</span><b id="v-be-vol">—</b></div>
+        <input type="range" id="be-vol" min="1000" max="120000" step="500" oninput="beVol(this.value)"></div>
+      <div class="slider-item"><div class="lab"><span>SKD 年固定成本（₹ 百万）</span><b id="v-be-skd">—</b></div>
+        <input type="range" id="be-skd" min="1" max="80" step="1" oninput="beFix('skd',this.value)"></div>
+      <div class="slider-item"><div class="lab"><span>CKD 年固定成本（₹ 百万）</span><b id="v-be-ckd">—</b></div>
+        <input type="range" id="be-ckd" min="1" max="80" step="1" oninput="beFix('ckd',this.value)"></div>
+    </div>
     <div class="legend" id="lg-be"></div>
     <div class="chart-wrap" id="ch-be"></div>
     <div id="be-text" style="margin-top:8px;"></div>
@@ -313,15 +322,48 @@
   </div>
 
   <div class="panel">
-    <h3>🧊 冰箱 · 🌀 洗衣机 · 💨 空气净化器</h3>
+    <h3>🧊 冰箱（单门直冷 / 双门无霜 / 多门）· BOM × 认证</h3>
     <table>
-      <thead><tr><th>品类</th><th>整机认证</th><th>关键部件认证</th><th>模式含义</th></tr></thead>
+      <thead><tr><th>部件/对象</th><th>强制认证</th><th>标准 / 依据</th><th>对模式的影响</th></tr></thead>
       <tbody>
-        <tr><td><b>冰箱</b></td><td>IS 7872（制冷器具QCO）+ 家电安全QCO 2024（IS 302系列，2025-03起分阶段）<a href="https://alephindia.in/bis-qco-extension-for-refrigerating-appliances.php" target="_blank">[QCO]</a></td><td>压缩机 IS 10617；制冷铜管 IS 10773；箱体钢板→钢铁QCO；发泡料无强制</td><td>与空调同构：压缩机+铜管+钢板三张"厂证网"推动直冷线本地化；风冷高端线 CBU 过渡期需提前办整机证</td></tr>
-        <tr><td><b>洗衣机</b></td><td>IS 302-2-7:2010（家用洗衣电器QCO 2023）<a href="https://www.bis.gov.in/wp-content/uploads/2024/03/Electrical-appliance-for-domestic-clothes-washing-QCO-2023.pdf" target="_blank">[QCO原文PDF]</a></td><td>电机/线缆/钢板（钢铁QCO）；无压缩机与铜管问题</td><td>认证矩阵比冰空简单 → 这就是"波轮直接找本地代工最快"的认证侧原因（代工厂已持证）</td></tr>
-        <tr><td><b>空气净化器</b></td><td>IS 302 (Part 1):2024（家电安全QCO 2024，2024-09-20通告）<a href="https://evtlindia.com/isi-mark/bis-certification-for-air-cleaning-appliances" target="_blank">[认证说明]</a> ⚠️ 注意：走 <b>ISI 许可</b>路线（此前资料常误写为CRS注册）</td><td>滤网无强制；电源线 IS 694</td><td>只有一张整机证 + 低关税7.5% → 认证一次性办好后 CBU 直发完全成立</td></tr>
+        <tr><td><b>整机</b>（各门体结构同）</td><td><span class="tag ban">ISI 必须</span></td><td>IS 7872（制冷器具/冷冻QCO）+ 家电安全QCO 2024（IS 302系列，2025-03起分阶段）<a href="https://alephindia.in/bis-qco-extension-for-refrigerating-appliances.php" target="_blank">[QCO]</a></td><td>直冷/无霜/多门按型号族分别覆盖；CBU 试水也要先拿整机证（4–8个月）</td></tr>
+        <tr><td><b>密闭压缩机</b></td><td><span class="tag ban">ISI 必须</span></td><td>IS 10617（零部件QCO 2025）</td><td>与空调同：选持证供应商或印度本地产</td></tr>
+        <tr><td><b>制冷铜管</b></td><td><span class="tag ban">铜厂必须持证</span></td><td>IS 10773（铜产品QCO 2024）<a href="https://www.bis.gov.in/copper-product-quality-control-amendment-order-2025/?lang=en" target="_blank">[BIS原文]</a></td><td>本地采购持证厂铜管</td></tr>
+        <tr><td><b>箱体钢板</b></td><td><span class="tag ban">钢厂必须持证</span></td><td>钢铁QCO 2024（HS 72/73章）<a href="https://steel.gov.in/quality-control-orders" target="_blank">[钢铁部清单]</a></td><td>箱体冲压本地化（用持证印度钢）——直冷大众线被逼本地制造的核心原因之一</td></tr>
+        <tr><td>温控器件</td><td><span class="tag ban">ISI 必须</span></td><td>IS 60730-2-9（零部件QCO 2025）</td><td>选持证供应商</td></tr>
+        <tr><td>发泡料（聚氨酯）/门封</td><td><span class="tag info">无BIS强制</span></td><td>—</td><td>可进口或本地采购，不构成认证障碍</td></tr>
+        <tr><td>电线/电容</td><td><span class="tag cond">视品类</span></td><td>IS 694 / IS 2993 等</td><td>本地采购省事</td></tr>
       </tbody>
     </table>
+    <div class="rec"><b>结论：</b>冰箱与空调同构（压缩机+铜管+钢板三张"厂证网"）——但<b>没有整机进口禁令</b>，所以高端无霜/多门可以「整机证+CBU」过渡，大众直冷只能本地化。这就是细分品类推荐不同模式的认证侧原因。</div>
+  </div>
+
+  <div class="panel">
+    <h3>🌀 洗衣机（波轮 / 滚筒）· BOM × 认证</h3>
+    <table>
+      <thead><tr><th>部件/对象</th><th>强制认证</th><th>标准 / 依据</th><th>对模式的影响</th></tr></thead>
+      <tbody>
+        <tr><td><b>整机</b>（波轮/滚筒同标准）</td><td><span class="tag ban">ISI 必须</span></td><td>IS 302-2-7:2010（家用洗衣电器QCO 2023）<a href="https://www.bis.gov.in/wp-content/uploads/2024/03/Electrical-appliance-for-domestic-clothes-washing-QCO-2023.pdf" target="_blank">[QCO原文PDF]</a></td><td>每个型号族一张证；代工厂已持证=最快通道</td></tr>
+        <tr><td><b>外壳/内筒钢板</b></td><td><span class="tag ban">钢厂必须持证</span></td><td>钢铁QCO 2024</td><td>不锈钢内筒/面板转本地持证钢源</td></tr>
+        <tr><td>电机（波轮/滚筒驱动）</td><td><span class="tag cond">能效/安全标准</span></td><td>IS 12615 等</td><td>可进口；变频电机+驱动板无专门QCO</td></tr>
+        <tr><td>电线/电容</td><td><span class="tag cond">视品类</span></td><td>IS 694 / IS 2993</td><td>本地采购</td></tr>
+        <tr><td>排水泵/水位传感器/塑料桶体</td><td><span class="tag info">无BIS强制</span></td><td>—</td><td>可随散件进口</td></tr>
+      </tbody>
+    </table>
+    <div class="rec"><b>结论：</b>洗衣机<b>没有压缩机、没有铜管</b>——认证矩阵只有「整机证+钢板」两格，是四个品类里最薄的。这解释了两件事：①波轮找本地代工最快（用对方的整机证）；②滚筒经泰国 CBU（AIFTA）反而常见——认证负担不重时，关税与固定成本主导决策（见🌏东盟路径页的 TCL 案例）。</div>
+  </div>
+
+  <div class="panel">
+    <h3>💨 空气净化器 · BOM × 认证</h3>
+    <table>
+      <thead><tr><th>部件/对象</th><th>强制认证</th><th>标准 / 依据</th><th>对模式的影响</th></tr></thead>
+      <tbody>
+        <tr><td><b>整机</b></td><td><span class="tag ban">ISI 必须</span></td><td>IS 302 (Part 1):2024（家电安全QCO 2024，2024-09-20通告）<a href="https://evtlindia.com/isi-mark/bis-certification-for-air-cleaning-appliances" target="_blank">[认证说明]</a> ⚠️ 走 <b>ISI 许可</b>路线（此前资料常误写为CRS注册）</td><td>中国工厂办 FMCS 整机证后即可 CBU 直发</td></tr>
+        <tr><td>HEPA/活性炭滤网</td><td><span class="tag info">无BIS强制</span></td><td>—</td><td>耗材可随整机/单独进口——续费生意不受认证阻碍</td></tr>
+        <tr><td>风机电机/电源线</td><td><span class="tag cond">视品类</span></td><td>IS 694（电源线）</td><td>整机内置件随整机证覆盖</td></tr>
+      </tbody>
+    </table>
+    <div class="rec"><b>结论：</b>认证矩阵只有一格（整机），关税只有 7.5%——两个最薄的壁垒叠加，就是「空净=唯一适合中国 CBU 直发的品类」的完整论证。</div>
   </div>
 
   <div class="panel">
@@ -338,6 +380,44 @@
       </tbody>
     </table>
     <div class="note" style="margin-bottom:0;"><b>时间与费用量级（计划用）：</b>整机 FMCS 全流程典型 <b>4–8 个月</b>；费用构成 = 申请/审核费 + 审核官差旅 + 实验室测试费 + 年度标志费，每型号族合计通常数十万人民币量级（本平台认证费参数即此口径，按3年摊销，可改）。<b>捷径：</b>委托已持证的印度 ODM（Amber/Dixon/PGEL/EPACK）= 跳过②–④，用对方的证出货——这也是认证侧支持"轻资产代工优先"的原因。</div>
+  </div>
+</section>
+
+<!-- ════════════ TAB 4.6 东盟路径 & 印尼 ════════════ -->
+<section id="tab-asean" class="tab">
+  <div class="panel">
+    <h2>🇹🇭 第四条路径：经东盟工厂 CBU 进印度（您客户问的 TCL 洗衣机案例）</h2>
+    <div class="sub"><b>客户的问题：</b>「TCL 的洗衣机为什么通过泰国走 CBU 模式进印度，而不是 CKD 直接打入？」——答案是<b>印度-东盟自贸协定（AIFTA）+ 借用现成产能的固定成本</b>，逻辑完全可以用本平台的盈亏平衡框架解释：</div>
+    <table>
+      <thead><tr><th>路径</th><th>关税</th><th>固定成本</th><th>评价</th></tr></thead>
+      <tbody>
+        <tr><td><b>① 中国直发 CBU</b></td><td>BCD 20% + IGST 28%（综合约56%）</td><td>最低（贸易合规）</td><td>税负杀死大众价格带</td></tr>
+        <tr><td><b>② 印度 CKD 组装</b></td><td>零部件约 10–15%</td><td><b>最高</b>：自建线 ₹千万级/年，或代工让利；BIS 认证矩阵全套</td><td>量大才划算（见盈亏平衡图）</td></tr>
+        <tr><td><b>③ 泰国工厂 CBU（AIFTA）</b></td><td><b>AIFTA 优惠税率</b>——印度-东盟自贸协定 2010 年生效，约 75% 税目关税已降至零/低位（具体税目须查官方减让表）</td><td><b>≈0 增量</b>：TCL 泰国春武里工厂本来就在为东南亚/全球供货，固定成本已被其他市场摊掉</td><td><b>= 借别人的固定成本 + 享 FTA 关税</b>——在中等销量区间常常是三条路里最优的</td></tr>
+      </tbody>
+    </table>
+    <div class="rec"><b>用盈亏平衡语言给客户讲：</b>印度 CKD 的优势要靠销量摊薄组装线固定成本；TCL 在印度洗衣机销量还没到那个临界量，但它在泰国已有一条被全球订单喂饱的产线——经泰国 CBU 等于「固定成本=0 + 关税≈FTA优惠价」，自然优于在印度从零建线。<b>等印度销量越过临界量，逻辑会反转</b>（这正是 LG/三星/海尔在印度本地化滚筒产线的原因）。海尔、美的在泰国/越南的基地服务印度，同理。</div>
+    <div class="note"><b>⚠️ 但这条路有两道门槛（不是简单转口！）：</b>
+    ① <b>原产地规则</b>：享受 AIFTA 税率需泰国签发的原产地证（CO Form AI），货物须满足实质性改变标准（典型为增值35%+税号改变，具体以协定文本为准 <span class="tag verify">需按税目核实</span>）——中国件运到泰国"换箱贴标"不构成原产，印度 CAROTAR 2020 核查严格，违规按逃税处理；
+    ② <b>部分税目在印度的排除/敏感清单上</b>，不享受或少享受减让——<b>具体到 HS 8450 洗衣机的现行 AIFTA 税率，请用印度官方查询工具核验</b>（输入HS编码+原产国即出税率，免费）。</div>
+    <div class="src">📊 可点击核验：<a href="https://www.indiantradeportal.in/" target="_blank">Indian Trade Portal（官方 FTA 税率查询：HS编码×原产国）</a> · <a href="https://www.cbic.gov.in/htdocs-cbec/customs/cs-act/formatted-htmls/agmt-asean" target="_blank">CBIC AIFTA 协定文本与税率通知</a> · <a href="https://www.enterprisesg.gov.sg/grow-your-business/go-global/international-agreements/free-trade-agreements/find-an-fta/aifta" target="_blank">AIFTA 概览（75%税目降税，2010年生效）</a></div>
+  </div>
+
+  <div class="panel">
+    <h2>🇮🇩 印尼速览：为什么模式逻辑和印度完全相反</h2>
+    <div class="sub">同样的四个品类，印尼的政策结构与印度<b>镜像相反</b>：印度用高关税+认证矩阵逼你 CKD；印尼关税≈0（中国-东盟自贸协定 ACFTA），门槛在<b>认证（SNI）、进口许可和本地含量（TKDN）</b>。</div>
+    <table>
+      <thead><tr><th>维度</th><th>印度 🇮🇳</th><th>印尼 🇮🇩</th></tr></thead>
+      <tbody>
+        <tr><td><b>对华关税</b></td><td>整机 BCD 20%（空净7.5%）+ IGST</td><td><b>ACFTA 正常轨道 ≈ 0%</b>（2010年起，凭 Form E 原产地证）——关税不是门槛</td></tr>
+        <tr><td><b>强制认证</b></td><td>BIS/ISI 矩阵（整机+压缩机+铜管+钢板…），认证落到部件和工厂</td><td><b>SNI 强制</b>：空调 SNI IEC 60335-2-40、冰箱 -2-24、洗衣机 -2-7（2013年34号部长令，2014年4月生效）；LSPro 机构对<b>中国工厂现场审核</b>+印尼实验室测试，逐型号</td></tr>
+        <tr><td><b>进口管制</b></td><td>DGFT 禁令（空调含制冷剂整机）</td><td>进口商执照（API-U/NIB）+ 部分家电需工业部技术考量（Pertek）/进口配额——2024年起进口管制收紧 <span class="tag verify">配额细则需按最新 Permendag 核实</span></td></tr>
+        <tr><td><b>本地化激励</b></td><td>PLI 补贴零部件 + 关税梯度</td><td><b>TKDN 本地含量</b>（25–40%门槛）：政府采购准入与多项激励与之挂钩；满足门槛享通关便利/税收优惠</td></tr>
+        <tr><td><b>模式结论</b></td><td>白电被逼向 SKD/CKD（空净例外）</td><td><b>CBU 中国直发在关税上完全成立</b>，先决条件是 SNI 证；上量后受配额与 TKDN 牵引转向本地组装（雅加达周边代工生态：当地有 Polytron、与日韩系产能）</td></tr>
+      </tbody>
+    </table>
+    <div class="rec"><b>给客户的打法建议（初版）：</b>印尼先走「中国工厂办 SNI + CBU 直发」试市场（比印度快得多，没有部件认证矩阵），同时监控进口许可政策；月销过万台或要进政府/项目渠道时，再评估本地组装满足 TKDN。<b>注意季节差</b>：印尼空调全年有需求（热带），没有印度式的旺季博弈。</div>
+    <div class="src">📊 来源：<a href="https://www.iea.org/policies/1724-indonesia-national-standard-for-air-conditioning-refrigerator-and-washing-machine-ministerial-regulation-no34m-indper72013" target="_blank">IEA：印尼34/2013号部长令（空冰洗 SNI 强制）</a> · <a href="https://jten.co.id/sni-certification-for-air-conditioners-refrigerators-and-washing-machines/" target="_blank">空冰洗 SNI 认证指南（标准号）</a> · <a href="https://www.trade.gov/country-commercial-guides/indonesia-import-tariffs" target="_blank">美国商务部：印尼关税指南（含ACFTA）</a> · <a href="https://www.arma-law.com/news-event/newsflash/understanding-indonesias-local-content-tkdn-framework" target="_blank">TKDN 本地含量框架（律所解读）</a> · <a href="https://www.cekindo.com/pdf/List-of-Products-with-Mandatory-SNI-Certification.pdf" target="_blank">SNI 强制清单（PDF）</a>。⚠️ 本节为<b>初版调研</b>：印尼进口配额/Pertek 细则变化快，落地前需按最新 Permendag 法规核实。</div>
   </div>
 </section>
 
@@ -358,7 +438,7 @@
 <section id="tab-mydata" class="tab">
   <div class="panel">
     <h2>产品清单 <span class="badge user">用户数据</span></h2>
-    <div class="sub">在这里维护产品；模拟器的下拉框与此同步。也可从 Excel 粘贴批量导入（格式：名称,品类代码,FOB价,币种,年销量；品类代码：ac=空调 fridgeFF=风冷冰箱 fridgeDC=直冷冰箱 washerFL=滚筒 washerTL=波轮 purifier=空净）。</div>
+    <div class="sub">在这里维护产品；模拟器的下拉框与此同步。也可从 Excel 粘贴批量导入（格式：名称,品类代码,FOB价,币种,年销量；品类代码：ac=空调 fridgeFF=风冷冰箱 fridgeMD=多门冰箱 fridgeDC=直冷冰箱 washerFL=滚筒 washerTL=波轮 purifier=空净）。</div>
     <div style="overflow-x:auto;">
     <table id="md-prods"><thead><tr><th>名称</th><th>品类</th><th>FOB单价</th><th>币种</th><th>年销量</th><th></th></tr></thead><tbody></tbody></table>
     </div>
@@ -406,6 +486,10 @@ const DEFAULTS = {
       modes:{ cbu:{bcd:20, igst:28, freight:22, asm:0,   cert:1800000, fixed:2000000},
               skd:{bcd:15, igst:18, freight:16, asm:350, cert:1800000, fixed:10000000},
               ckd:{bcd:10, igst:18, freight:13, asm:650, cert:1800000, fixed:45000000} } },
+    fridgeMD: { name:'冰箱·多门/十字', hs:'8418', retailRef:[55000,95000],
+      modes:{ cbu:{bcd:20, igst:28, freight:26, asm:0,   cert:1800000, fixed:2000000},
+              skd:{bcd:15, igst:18, freight:19, asm:450, cert:1800000, fixed:12000000},
+              ckd:{bcd:10, igst:18, freight:15, asm:750, cert:1800000, fixed:50000000} } },
     fridgeDC: { name:'冰箱·单门直冷', hs:'8418', retailRef:[12000,20000],
       modes:{ cbu:{bcd:20, igst:28, freight:14, asm:0,   cert:1800000, fixed:2000000},
               skd:{bcd:15, igst:18, freight:10, asm:250, cert:1800000, fixed:8000000},
@@ -426,6 +510,7 @@ const DEFAULTS = {
   prods: [
     { name:'1.5匹变频空调',      cat:'ac',       fob:180, cur:'USD', vol:50000 },
     { name:'300L风冷无霜冰箱',   cat:'fridgeFF', fob:220, cur:'USD', vol:30000 },
+    { name:'450L多门/十字冰箱',  cat:'fridgeMD', fob:340, cur:'USD', vol:10000 },
     { name:'200L单门直冷冰箱',   cat:'fridgeDC', fob:120, cur:'USD', vol:40000 },
     { name:'8kg滚筒洗衣机',      cat:'washerFL', fob:150, cur:'USD', vol:25000 },
     { name:'8kg波轮洗衣机',      cat:'washerTL', fob:85,  cur:'USD', vol:35000 },
@@ -626,7 +711,7 @@ function renderReco(p, sc, modes, best){
   li.push(`<b>④ 规模门槛（CKD 不是免费的）：</b>CKD 要养组装线与团队（本模型估 ₹${fmtN((cat.modes.ckd.fixed||0)/1000000)}百万/年）、SKD ₹${fmtN((cat.modes.skd.fixed||0)/1000000)}百万/年，认证费按3年摊销。把固定成本算进去后，分段最优是：${segTxt}。<b>您当前 ${fmtN(p.vol)} 台/年 → ${MODE_NAMES[best.key]}</b>。数量改一下，推荐可能就变——这正是"按您的量身定制"而非"无脑CKD"。`);
   // ⑤ 品类特定合规
   if(p.cat==='ac') li.push(`<b>⑤ 本品类合规要点：</b>压缩机与温控器件已纳入 QCO（2025年修订）——CKD 进口压缩机也要 BIS 认证，倒逼用已认证供应商（GMCC/Highly 在印产能）或本地采购；整机需 BEE 星级（ISEER）能效标签。 <a href="https://www.elitasrcs.com/quality-control-orders/bis-qco-notification-for-air-conditioner-and-its-related-parts-hermetic-compressors-and-temperature-sensing-controls" target="_blank">[压缩机QCO]</a> <a href="https://www.beestarlabel.com/" target="_blank">[BEE数据库]</a>`);
-  if(p.cat==='fridgeFF'||p.cat==='fridgeDC'||p.cat==='washerFL'||p.cat==='washerTL') li.push(`<b>⑤ 本品类合规要点：</b>家用电器安全 QCO 2024（IS 302系列）已于2025年3月起分阶段强制——无论哪种模式，整机都需 BIS 认证（4–8个月）+ 能效标签（适用品类）。 <a href="https://absoluteveritas.com/bis-qco-for-safety-of-household-commercial-and-similar-electrical-appliances/" target="_blank">[QCO 2024时间表]</a>`);
+  if(p.cat==='fridgeFF'||p.cat==='fridgeMD'||p.cat==='fridgeDC'||p.cat==='washerFL'||p.cat==='washerTL') li.push(`<b>⑤ 本品类合规要点：</b>家用电器安全 QCO 2024（IS 302系列）已于2025年3月起分阶段强制——无论哪种模式，整机都需 BIS 认证（4–8个月）+ 能效标签（适用品类）。 <a href="https://absoluteveritas.com/bis-qco-for-safety-of-household-commercial-and-similar-electrical-appliances/" target="_blank">[QCO 2024时间表]</a>`);
   if(p.cat==='purifier') li.push(`<b>⑤ 本品类合规要点：</b>空净需 IS 302 (Part 1):2024 的 <b>ISI 许可</b>（家电安全QCO 2024 纳入空气净化器）+ 授权印度代表（AIR）——只有一张整机证、无部件认证矩阵、无禁令、低关税（HS 84213920 BCD 7.5%），所以是唯一"中国整机直发"经济性成立的品类（小米即此打法）。详见【🧩 认证地图】。 <a href="https://evtlindia.com/isi-mark/bis-certification-for-air-cleaning-appliances" target="_blank">[认证出处]</a> <a href="https://www.eximguru.com/indian-customs-duty/84213920-other-air-purifiers-or-cleaners.aspx" target="_blank">[税率出处]</a>`);
   // ⑥ 执行路径
   if(best.key!=='cbu') li.push(`<b>⑥ 执行路径（PN3 下怎么落地）：</b>Press Note 3 使中资自建/控股工厂需印度政府审批且长期停滞——${MODE_NAMES[best.key]}的现实做法是<b>委托已持证的印度 ODM</b>：安珀 Amber Enterprises (NSE: AMBER)、迪克森 Dixon Technologies (DIXON)、PG Electroplast (PGEL)、EPACK——均为上市公司，签约前财报免费尽调。 <a href="https://www.screener.in/" target="_blank">[Screener 财报]</a> <a href="https://www.manakonline.in/" target="_blank">[查持证]</a>`);
@@ -636,9 +721,24 @@ function renderReco(p, sc, modes, best){
     li.map(x=>`<li style="margin-bottom:9px;">${x}</li>`).join('') + '</ul>';
 }
 
+/* ── 盈亏平衡：交互控制 ── */
+function beVol(v){ const p=currentProd(); p.vol=Math.max(1,parseInt(v)||1); renderCalc(); }
+function beFix(mk,v){ const p=currentProd(); S.cats[p.cat].modes[mk].fixed=Math.max(0,parseFloat(v)||0)*1000000; renderCalc(); }
+
 /* ── 盈亏平衡图 ── */
 const MODE_COLORS = { cbu:'#dc2626', skd:'#2563eb', ckd:'#16a34a' };
 function renderBE(p, sc){
+  // 同步交互滑块
+  const volEl=document.getElementById('be-vol');
+  if(volEl){
+    const cm=S.cats[p.cat].modes;
+    volEl.value=Math.min(120000,p.vol);
+    document.getElementById('v-be-vol').textContent=fmtN(p.vol)+' 台';
+    document.getElementById('be-skd').value=Math.round((cm.skd.fixed||0)/1e6);
+    document.getElementById('v-be-skd').textContent='₹'+Math.round((cm.skd.fixed||0)/1e6)+'M/年';
+    document.getElementById('be-ckd').value=Math.round((cm.ckd.fixed||0)/1e6);
+    document.getElementById('v-be-ckd').textContent='₹'+Math.round((cm.ckd.fixed||0)/1e6)+'M/年';
+  }
   const { ms, segs, maxV } = beSegments(p, sc);
   const W=900,H=280,L=70,R=16,T=14,B=38;
   const total=(m,v)=>(m.r.varU*v+m.r.annualFixed);
@@ -663,10 +763,11 @@ function renderBE(p, sc){
   document.getElementById('ch-be').innerHTML=svg;
   document.getElementById('lg-be').innerHTML =
     ms.map(m=>`<span><i style="background:${MODE_COLORS[m.key]}"></i>${MODE_NAMES[m.key]}（变动 ₹${fmtN(m.r.varU)}/台 + 固定 ₹${(m.r.annualFixed/10000000).toFixed(2)}Cr/年）</span>`).join('');
+  const nowLine = ms.map(m=>`${MODE_NAMES[m.key].slice(0,3)} ₹${(total(m,p.vol)/10000000).toFixed(2)}Cr`).join(' / ');
   document.getElementById('be-text').innerHTML =
     '<div class="note" style="margin:0;">📐 <b>分段最优：</b>' +
     segs.map(s=>`年销量 ${fmtN(s.from)}${s.to>=1000000?' 台以上':' – '+fmtN(s.to)+' 台'} → <b style="color:${MODE_COLORS[s.mode]}">${MODE_NAMES[s.mode]}</b>`).join('　|　') +
-    '。<b>结论先于情绪：</b>量小用买的，量大用装的——临界点就是上面交叉的位置。</div>';
+    `。<br>📊 <b>在您当前 ${fmtN(p.vol)} 台/年：</b>各模式年总成本 = ${nowLine}。<b>结论先于情绪：</b>量小用买的，量大用装的——临界点就是上面交叉的位置。</div>`;
 }
 
 function barChart(elId, bars){
@@ -1042,9 +1143,9 @@ const CL_KB = [
   q:'空气净化器怎么进？',
   a:'<b>唯一适合中国整机直发（CBU）的品类</b>：BCD 仅 7.5% + IGST 18%（综合约 26.9%），无禁令。认证走 <b>IS 302 (Part 1):2024 的 ISI 许可</b>（家电安全 QCO 2024 已纳入空气净化器，2024-09-20 通告）+ 授权印度代表（AIR）。市场集中在德里 NCR 雾霾季（10–1 月），<b>按雾霾季倒排海运备货</b>。小米、飞利浦都是这个打法。',
   src:'税率出处：<a href="https://www.eximguru.com/indian-customs-duty/84213920-other-air-purifiers-or-cleaners.aspx" target="_blank">HS 84213920（EximGuru）</a>', tab:'calc', rel:['bis','region']},
- {id:'fridge', kw:['冰箱','直冷','风冷','无霜','对开门'],
+ {id:'fridge', kw:['冰箱','直冷','风冷','无霜','对开门','多门','十字'],
   q:'冰箱应该怎么进？',
-  a:'分两条线：<b>单门直冷</b>（大众市场）→ 必须本地化（CKD/本地制造），整机约 56% 综合税负在低价格带毫无空间；<b>对开门/风冷无霜</b>（高端）→ 可以 CBU 试水（高客单价能消化 20% BCD），但 QCO 生效后整机也要 BIS 认证（4–8 个月，先启动），上量后转 SKD/CKD。',
+  a:'分三条线：<b>单门直冷</b>（大众市场）→ 必须本地化（CKD/本地制造），整机约 56% 综合税负在低价格带毫无空间；<b>双门风冷无霜</b>（中高端）→ 可以 CBU 试水（高客单价能消化 20% BCD），但 QCO 生效后整机也要 BIS 认证（4–8 个月先启动），上量后转 SKD/CKD；<b>多门/十字门</b>（高端，量小）→ 量级通常在临界点以下，CBU/SKD 更优——模拟器里选「450L多门」拖一下销量滑块就能看到推荐怎么变。',
   src:'详见📄政策报告版分品类章节', tab:'calc', rel:['bis','modes']},
  {id:'washer', kw:['洗衣机','波轮','滚筒'],
   q:'洗衣机应该怎么进？',
@@ -1074,10 +1175,16 @@ const CL_KB = [
   q:'怎么分享给同事？',
   a:'两种方式：①直接转发本页<b>链接</b>（微信内置浏览器可完整使用，包括手机）；②要发<b>文件</b>就用 PDF 报告版（微信内任何手机都能直接打开）——找您的顾问索取《CostLens 印度市场专版》PDF。注意：把 .html 文件直接发到微信是打不开交互功能的。',
   src:'', rel:[]},
- {id:'fta', kw:['fta','东盟','泰国','越南','原产地','绕道','转口'],
-  q:'能经东盟转口降关税吗？',
-  a:'<b>理论上可行但门槛高。</b>印度-东盟 FTA 下自泰国/越南出口的关税显著更低（这正是中国大厂在泰越设厂服务印度的原因之一），但印度 CAROTAR 2020 原产地核查严格——要满足实质性增值比例，<b>简单转口/换标会被认定逃税</b>。本平台暂未内置该测算；请查 <a href="https://www.dgft.gov.in/" target="_blank">DGFT</a> FTA 文本并咨询清关合规顾问后再评估。',
-  src:'高级方案 · 需专业原产地认定', rel:['tariff','modes']},
+ {id:'fta', kw:['fta','东盟','泰国','越南','原产地','绕道','转口','aifta','tcl','为什么通过泰国','经泰国','泰国走cbu','第四条路'],
+  q:'TCL洗衣机为什么经泰国CBU进印度，不直接CKD？',
+  a:'这是<b>第四条路径：东盟工厂 CBU + AIFTA 关税优惠</b>。逻辑用盈亏平衡讲：印度 CKD 的优势要靠销量摊薄组装线固定成本；TCL 印度洗衣机销量未到临界量，但它泰国工厂的固定成本已被全球订单摊掉——经泰国 CBU = <b>借别人的固定成本 + 享 FTA 税率</b>（印度-东盟自贸协定 2010 年生效，约75%税目降至零/低位），在中等销量区间优于在印度从零建线。<b>两道门槛：</b>①需泰国原产地证（CO Form AI）+ 实质性改变（CAROTAR 核查严格，转口换标=逃税）；②部分税目在印度排除清单上——具体 HS 8450 现行税率用官方工具一查便知。等印度销量越过临界量，逻辑反转（LG/三星/海尔已本地化滚筒线）。详见【🌏 东盟路径·印尼】页。',
+  src:'核验工具：<a href="https://www.indiantradeportal.in/" target="_blank">Indian Trade Portal（HS×原产国查FTA税率）</a> · <a href="https://www.cbic.gov.in/htdocs-cbec/customs/cs-act/formatted-htmls/agmt-asean" target="_blank">CBIC AIFTA 文本</a>',
+  tab:'asean', rel:['breakeven','modes','indonesia']},
+ {id:'indonesia', kw:['印尼','印尼市场','印尼怎么','进印尼','indonesia','sni','acfta','tkdn','雅加达','东南亚市场','印度尼西亚'],
+  q:'印尼市场的模式逻辑和印度有什么不同？',
+  a:'<b>镜像相反。</b>印度：高关税(20%)+部件认证矩阵 → 逼你 CKD。印尼：<b>对华关税≈0</b>（ACFTA 2010年起，凭 Form E）→ <b>CBU 直发在关税上完全成立</b>；门槛换成了：①<b>SNI 强制认证</b>（空调 SNI IEC 60335-2-40、冰箱 -2-24、洗衣机 -2-7，2013年34号部长令；LSPro 赴中国工厂审核+印尼测试）；②进口商执照与进口管制（2024年起收紧，配额细则需按最新法规核实）；③<b>TKDN 本地含量</b>（25–40%，挂钩政府采购与激励）。打法：先「中国工厂办SNI + CBU试水」，上量或要进政府渠道再本地组装。详见【🌏 东盟路径·印尼】页。',
+  src:'出处：<a href="https://www.iea.org/policies/1724-indonesia-national-standard-for-air-conditioning-refrigerator-and-washing-machine-ministerial-regulation-no34m-indper72013" target="_blank">IEA：印尼SNI 34/2013部长令</a> · <a href="https://www.trade.gov/country-commercial-guides/indonesia-import-tariffs" target="_blank">印尼关税指南（ACFTA）</a>',
+  tab:'asean', rel:['fta','modes']},
 ];
 const CL_HOT = ['accbu','tariff','bis','fx','tradestat','odm'];
 let clBooted = false;
